@@ -1,0 +1,6 @@
+Hooks:PostHook(NetworkPeer,"set_unit","glorykills_networkpeer_setunit",function(self,unit, character_name, team_id, visual_seed)
+
+	if unit and self == managers.network:session():local_peer() and Utils:IsInGameState() then
+		GloryKills:spawn_third_unit(unit)
+	end
+end)

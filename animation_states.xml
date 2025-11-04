@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<tweaks>
+
+<!-- add fp execution state -->
+	<tweak version="2" name="anims/fps/fps_spawn" extension="animation_states">
+		<search>
+			<xml/>
+			<state name="fps"/>
+		</search>
+		<target mode="attach">
+		
+			<to name="execution" redirect="fps/unarmed/execution"/>
+		
+		</target>
+	</tweak> 
+	
+<!-- define anim to play during execution state -->
+	<tweak version="2" name="anims/fps/fps_spawn" extension="animation_states">
+		<search>
+			<xml/>
+		</search>
+		<target mode="attach">
+			
+			<state name="fps/unarmed/execution" type="once" segment="base" speed="1.0">
+				<anim name="heister_execution"/>
+				<!--
+				<keys>
+					<key at="enter" callback="anim_start_execution" class_name="base"/>
+					<key at="exit" callback="anim_stop_execution" class_name="base"/>
+				</keys>
+				-->
+				<exit name="fps/empty"/>
+			</state>
+			
+		</target>
+	</tweak> 
+	
+	
+	
+<!-- add redirects to point to the new anim state -->
+	<tweak version="2" name="anims/units/enemies/cop/std" extension="animation_states">
+		<search>
+			<xml/>
+			<state name="std"/>
+		</search>
+		
+		<target mode="attach">
+			<to name="death_execution" redirect="std/death/execution"/>
+		</target>
+	</tweak>
+
+	<tweak version="2" name="anims/units/enemies/cop/std" extension="animation_states">
+		<search>
+			<xml/>
+			<state name="std/crouch"/>
+		</search>
+		
+		<target mode="attach">
+			<to name="death_execution" redirect="std/death/execution"/>
+		</target>
+	</tweak>
+	
+	<tweak version="2" name="anims/units/enemies/cop/std" extension="animation_states">
+		<search>
+			<xml/>
+			<state name="std/zipline"/>
+		</search>
+		
+		<target mode="attach">
+			<to name="death_execution" redirect="std/death/execution"/>
+		</target>
+	</tweak>
+	
+	
+<!-- define anim to play during executed state -->
+	<tweak version="2" name="anims/units/enemies/cop/std" extension="animation_states">
+		<search>
+			<xml/>
+		</search>
+		
+		<target mode="attach">
+			<state name="std/death/execution" type="mix" segment="base">
+				<param name="var1" value="1"/>
+				<anim name="gen_death_execution" weight="var1"/>
+				
+				<exit name="death_exit"/>
+			</state>
+		</target>
+	</tweak>
+	
+</tweaks>
