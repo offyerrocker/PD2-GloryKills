@@ -23,8 +23,10 @@
 			<state name="std/stand/execution" type="once" segment="base" speed="1.0">
 				<anim name="heister_execution"/>
 				<keys>
-					<key at="enter" callback="anim_start_execution" class_name="base"/>
-					<key at="exit" callback="anim_stop_execution" class_name="base"/>
+					<key at="execution_slap" callback="anim_execution_slap" class_name="base"/>
+					<key at="execution_punchthroat" callback="anim_execution_punchthroat" class_name="base"/>
+					<key at="execution_grab" callback="anim_execution_grab" class_name="base"/>
+					<key at="execution_kill" callback="anim_execution_kill" class_name="base"/>
 				</keys>
 				<exit name="std/stand/still/idle/look"/>
 			</state>
