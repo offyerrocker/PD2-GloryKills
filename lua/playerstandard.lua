@@ -354,8 +354,8 @@ _G.testhook = function(self, t, input)
 				local damage_info = { -- for triggering the anim
 					damage = attack_data.damage,
 					variant = "melee",
-					pos = Vector3(),
-					attack_dir = Vector3(),
+					pos = col_ray.hit_position or col_ray.position,
+					attack_dir = col_ray.ray,
 					result = {
 						variant = "melee",
 						type = "execution"
@@ -380,9 +380,9 @@ _G.testhook = function(self, t, input)
 					hit_unit:movement():set_m_pos(my_pos)
 					hit_unit:movement():play_redirect("death_execution")
 					
+					self._state_data.execution_unit = hit_unit
 					
-					
-					my_mov_ext:change_state("execution")
+					--my_mov_ext:change_state("execution")
 					
 					-- disable the melee that would otherwise occur on this frame
 					self._state_data.melee_attack_wanted = 0

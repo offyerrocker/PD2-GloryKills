@@ -71,6 +71,7 @@ function GloryKills:spawn_third_unit(unit)
 
 	local look_vec_modified = Vector3()
 	unit_movement.update = function (_self, ...)
+	--[[
 		HuskPlayerMovement.update(_self, ...)
 		if alive(self.fp_unit) then
 			-- correct aiming direction so that lasers are approximately the same in first and third person
@@ -78,6 +79,15 @@ function GloryKills:spawn_third_unit(unit)
 			mvector3.rotate_with(look_vec_modified, Rotation(self.fp_unit:camera():rotation():z(), 1))
 			_self:set_look_dir_instant(look_vec_modified)
 		end
+	--]]
+	end
+
+	unit_movement.play_redirect = function(self,redirect_name,at_time)
+		if not foobar then Print("play_redirect",redirect_name,debug.traceback()) end
+	end
+
+	unit_movement.play_state = function(self,state_name,at_time)
+		if not foobar then Print("play_state",state_name,debug.traceback()) end
 	end
 
 	unit_movement.sync_action_walk_nav_point = function (_self, pos, speed, action)
@@ -113,7 +123,7 @@ function GloryKills:spawn_third_unit(unit)
 
 	local hide_vec = Vector3(0, 0, -10000)
 	unit_movement.set_position = function (_self, pos)
-		if alive(self.fp_unit) and self.fp_unit:camera():first_person() then
+		if false then -- if alive(self.fp_unit) and self.fp_unit:camera():first_person() then
 			_self._unit:set_position(hide_vec)
 		else
 			-- partial fix for movement sync, not perfect as it overrides some movement animations like jumping
