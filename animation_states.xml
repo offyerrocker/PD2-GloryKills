@@ -23,10 +23,10 @@
 			<state name="std/stand/execution" type="once" segment="base" speed="1.0">
 				<anim name="heister_execution"/>
 				<keys>
-					<key at="execution_slap" callback="anim_execution_slap" class_name="base"/>
-					<key at="execution_punchthroat" callback="anim_execution_punchthroat" class_name="base"/>
-					<key at="execution_grab" callback="anim_execution_grab" class_name="base"/>
-					<key at="execution_kill" callback="anim_execution_kill" class_name="base"/>
+					<key at="trigger" trigger="execution_slap" callback="anim_execution_slap" class_name="base"/>
+					<key at="trigger" trigger="execution_punchthroat" callback="anim_execution_punchthroat" class_name="base"/>
+					<key at="trigger" trigger="execution_grab" callback="anim_execution_grab" class_name="base"/>
+					<key at="trigger" trigger="execution_kill" callback="anim_execution_kill" class_name="base"/>
 				</keys>
 				<exit name="std/stand/still/idle/look"/>
 			</state>
@@ -79,7 +79,38 @@
 			<state name="std/death/execution" type="mix" segment="base">
 				<param name="var1" value="1"/>
 				<anim name="gen_death_execution" weight="var1"/>
+				<keys timebase="relative"> <!-- should this be "frames"? -->
+					
+					<key at="trigger" trigger="execution_slap" callback="anim_execution_generic" class_name="character_damage" param1="1"/>
+					<key at="trigger" trigger="execution_punch" callback="anim_execution_generic" class_name="character_damage" param1="2"/>
+					<key at="trigger" trigger="execution_grab" callback="anim_execution_generic" class_name="character_damage" param1="3"/>
+					<key at="trigger" trigger="execution_kill" callback="anim_execution_generic" class_name="character_damage" param1="4"/>
+					
+					<key at="trigger" trigger="death" callback="anim_execution_generic" class_name="character_damage" param1="5"/>
+					<key at="death" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
+					
+					<!--
+					<key at="trigger" trigger="force_ragdoll" callback="anim_execution_generic" class_name="character_damage" param1="5"/>
+					<key at="trigger" trigger="enable_ragdoll" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
 				
+					<key at="trigger" trigger="force_ragdoll" callback="anim_clbk_force_ragdoll" class_name="movement"/>
+					<key at="trigger" trigger="enable_ragdoll" set_extension="anim_data" extension_key="ragdoll" extension_value="true"/>
+					-->
+					
+					<key at="enter" callback="anim_execution_generic" class_name="character_damage" param1="7"/>
+					<key at="exit" callback="anim_execution_generic" class_name="character_damage" param1="8"/>
+					
+					<key at="enter" set_extension="anim_data" extension_key="death" extension_value="true"/>
+					<key at="exit" set_extension="anim_data" extension_key="death" extension_value="false"/>
+					<key at="exit" callback="anim_clbk_force_ragdoll" class_name="movement"/>
+					<key at="exit" set_extension="anim_data" extension_key="ragdoll" extension_value="false"/>
+					<!--
+					<key at="trigger" trigger="force_ragdoll" callback="anim_clbk_force_ragdoll" class_name="movement"/>
+					<key at="trigger" trigger="enable_ragdoll" set_extension="anim_data" extension_key="ragdoll" extension_value="true"/>
+					<key at="exit" callback="anim_clbk_force_ragdoll" class_name="movement"/>
+					<key at="exit" set_extension="anim_data" extension_key="ragdoll" extension_value="false"/>
+					-->
+				</keys>
 				<exit name="death_exit"/>
 			</state>
 		</target>

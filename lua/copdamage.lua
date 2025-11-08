@@ -9,6 +9,21 @@ CopDamage._hurt_severities = {
 	none = false
 }
 --]]
+
+
+
+function CopDamage:anim_execution_generic(unit,a)
+	Print("CD Animation callback:",unit,a,type(a))
+	
+	if a == 5 then
+		unit:anim_data().ragdoll = true
+--		unit:movement():anim_clbk_force_ragdoll(unit)
+	elseif a == 8 then
+		unit:movement():anim_clbk_force_ragdoll(unit)
+	end
+end
+
+
 do return end
 
 

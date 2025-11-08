@@ -82,9 +82,9 @@ function GloryKills:spawn_third_unit(unit)
 	--]]
 	end
 
-	unit_movement.play_redirect = function(self,redirect_name,at_time)
-		if not foobar then Print("play_redirect",redirect_name,debug.traceback()) end
-	end
+--	unit_movement.play_redirect = function(self,redirect_name,at_time)
+--		if not foobar then Print("play_redirect",redirect_name,debug.traceback()) end
+--	end
 
 	unit_movement.play_state = function(self,state_name,at_time)
 		if not foobar then Print("play_state",state_name,debug.traceback()) end

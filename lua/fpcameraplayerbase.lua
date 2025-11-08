@@ -7,6 +7,9 @@ end
 function FPCameraPlayerBase:anim_execution_grab(...)
 
 end
+function FPCameraPlayerBase:anim_execution_generic(s)
+	Print("Animation callback:",s)
+end
 function FPCameraPlayerBase:anim_execution_kill(...)
 	local player = managers.player:local_player()
 	local mov_ext = alive(player) and player:movement()

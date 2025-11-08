@@ -1,3 +1,51 @@
+
+--[[
+
+
+todo:
+
+figure out the "proper" way to trigger death logic AND death animations
+- death logic shouldn't do anything to the unit that would cause a crash with other players
+	- freeze the unit, preventing it from taking action
+		- this entails disabling the brain ai and unregistering it with the groupai state/manager
+	- kill the unit, counting as a kill
+		- needs to call on-kill listeners like in playermanager
+- death animations
+	- can't be interrupted by other idle animations
+	- does it need to be an "action"?
+	- ideally it should be automatically triggered via the damage_whatever function, 
+	  where the usual listeners are called,
+	  so the only difference would be which animation is chosen
+
+
+
+
+
+
+	
+execution_slap first slap of the cop weapon to the side
+execution_punch punch
+execution_grab grabbing the cop's head
+execution_kill headbutt
+death presumed ragdoll timing so at this trigger i thought itd be ok to turn the cop into a ragdoll
+also the player animation is 46 frames long
+the cop animation is 71
+
+test triggering death anim from calling listeners
+
+check if custom state syncing will crash unmodded clients
+	
+	
+	
+	
+	
+	
+	
+	--]]
+
+
+
+
 --local mov = managers.player:local_player():movement():current_state()._fwd_ray.unit:movement()
 --managers.player:local_player():movement():current_state()._fwd_ray.unit:chk_freeze_anims()
 --mov:play_redirect("execution")
@@ -6,15 +54,21 @@
 function CopActionHurt:init(action_desc, common_data) end
 
 
-managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():play_redirect("stand")
+
+
+managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():play_redirect("death_exit")
+managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():play_redirect("up_idle")
+managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():anim_clbk_force_ragdoll()
 managers.player:local_player():movement():current_state()._fwd_ray.unit:anim_data().ragdoll = true
 managers.player:local_player():movement():current_state()._fwd_ray.unit:set_slot(0)
 
 
+execute_unit(managers.player:local_player():movement():current_state()._fwd_ray.unit)
+
 local player = managers.player:local_player()
 local fwd_ray = player:movement():current_state()._fwd_ray
 			local attack_data = {
-				variant = "execution",
+				variant = "tase",
 				damage = 1000000,
 				damage_effect = 0,
 				attacker_unit = player,
@@ -22,15 +76,30 @@ local fwd_ray = player:movement():current_state()._fwd_ray
 				name_id = managers.blackmarket:equipped_melee_weapon(),
 				charge_lerp_value = 0
 			}
-			fwd_ray.unit:character_damage():die(attack_data)
+--fwd_ray.unit:character_damage():die(attack_data)
+fwd_ray.unit:character_damage():damage_melee(attack_data)
 			
+local player = managers.player:local_player()
+local fwd_ray = player:movement():current_state()._fwd_ray
+local damage_info = {
+	variant = "execution",
+	damage = 1000000,
+	damage_effect = 0,
+	attacker_unit = player,
+	col_ray = fwd_ray,
+	name_id = managers.blackmarket:equipped_melee_weapon(),
+	charge_lerp_value = 0
+}			
+local a = fwd_ray.unit; a:brain():clbk_death(a,damage_info)
+
+
 --			managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():play_redirect("death_execution")
 --			GloryKills.unit:movement():play_redirect("death_execution")
 			
 			managers.player:local_player():movement():current_state()._fwd_ray.unit:movement():action_request({
-				type = "hurt",
+				type = "death",
 				hurt_type = "death",
-				variant = "execution",
+				variant = "bullet",
 				direction_vec = Vector3(),
 				hit_pos = Vector3(),
 				body_part = 1,
@@ -77,7 +146,6 @@ local fwd_ray = player:movement():current_state()._fwd_ray
 				}
 				managers.player:local_player():movement():current_state()._fwd_ray.unit:character_damage():_call_listeners(damage_info)
 					
-	
 	
 	
 	

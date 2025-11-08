@@ -16,171 +16,7 @@ local tmp_vec3 = Vector3()
 
 CopActionHurt.fire_death_anim_variants.execution = nil
 
-do return end
-
-CopActionHurt.death_anim_variants = {
-	normal = {
-		crouching = {
-			fwd = {
-				high = 14,
-				low = 5
-			},
-			bwd = {
-				high = 3,
-				low = 1
-			},
-			l = {
-				high = 3,
-				low = 1
-			},
-			r = {
-				high = 3,
-				low = 1
-			}
-		},
-		not_crouching = {
-			fwd = {
-				high = 13,
-				low = 6
-			},
-			bwd = {
-				high = 3,
-				low = 2
-			},
-			l = {
-				high = 3,
-				low = 1
-			},
-			r = {
-				high = 3,
-				low = 1
-			}
-		}
-	},
-	heavy = {
-		crouching = {
-			fwd = {
-				high = 7,
-				low = 2
-			},
-			bwd = {
-				high = 3,
-				low = 1
-			},
-			l = {
-				high = 3,
-				low = 1
-			},
-			r = {
-				high = 3,
-				low = 1
-			}
-		},
-		not_crouching = {
-			fwd = {
-				high = 6,
-				low = 2
-			},
-			bwd = {
-				high = 1,
-				low = 1
-			},
-			l = {
-				high = 1,
-				low = 1
-			},
-			r = {
-				high = 1,
-				low = 1
-			}
-		}
-	}
-}
-CopActionHurt.death_anim_fe_variants = {
-	normal = {
-		crouching = {
-			fwd = {
-				high = 5,
-				low = 2
-			},
-			bwd = {
-				high = 2,
-				low = 0
-			},
-			l = {
-				high = 2,
-				low = 0
-			},
-			r = {
-				high = 2,
-				low = 0
-			}
-		},
-		not_crouching = {
-			fwd = {
-				high = 6,
-				low = 2
-			},
-			bwd = {
-				high = 3,
-				low = 0
-			},
-			l = {
-				high = 2,
-				low = 0
-			},
-			r = {
-				high = 2,
-				low = 0
-			}
-		}
-	},
-	heavy = {
-		crouching = {
-			fwd = {
-				high = 0,
-				low = 0
-			},
-			bwd = {
-				high = 0,
-				low = 0
-			},
-			l = {
-				high = 0,
-				low = 0
-			},
-			r = {
-				high = 0,
-				low = 0
-			}
-		},
-		not_crouching = {
-			fwd = {
-				high = 0,
-				low = 0
-			},
-			bwd = {
-				high = 0,
-				low = 0
-			},
-			l = {
-				high = 0,
-				low = 0
-			},
-			r = {
-				high = 0,
-				low = 0
-			}
-		}
-	}
-}
-
-
--- around here is when i stopped worrying about compatibility
-
 function CopActionHurt:init(action_desc, common_data)
-	foo2 = action_desc
-	
 	self._common_data = common_data
 	self._ext_movement = common_data.ext_movement
 	self._ext_inventory = common_data.ext_inventory
@@ -198,15 +34,14 @@ function CopActionHurt:init(action_desc, common_data)
 	local fire_variant = "fire"
 	local redir_res = nil
 	local action_type = action_desc.hurt_type
-
+	
+	_G.foo9 = action_desc
+	
 	if action_type == "knock_down" then
 		action_type = "heavy_hurt"
 	end
-	
-	if action_type == "death" and action_desc.variant == "execution" then
-		redir_res = self._ext_movement:play_redirect("death_execution")
-		
-	elseif action_type == "fatal" then
+
+	if action_type == "fatal" then
 		redir_res = self._ext_movement:play_redirect("fatal")
 
 		if not redir_res then
@@ -540,6 +375,7 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 
 		if redirect then
+			Print("Playing redirect:",redirect)
 			redir_res = self._ext_movement:play_redirect(redirect)
 		else
 			Application:stack_dump_error("There's no redirect in CopActionHurt!")
@@ -819,3 +655,162 @@ function CopActionHurt:init(action_desc, common_data)
 	return true
 end
 
+
+do return end
+
+CopActionHurt.death_anim_variants = {
+	normal = {
+		crouching = {
+			fwd = {
+				high = 14,
+				low = 5
+			},
+			bwd = {
+				high = 3,
+				low = 1
+			},
+			l = {
+				high = 3,
+				low = 1
+			},
+			r = {
+				high = 3,
+				low = 1
+			}
+		},
+		not_crouching = {
+			fwd = {
+				high = 13,
+				low = 6
+			},
+			bwd = {
+				high = 3,
+				low = 2
+			},
+			l = {
+				high = 3,
+				low = 1
+			},
+			r = {
+				high = 3,
+				low = 1
+			}
+		}
+	},
+	heavy = {
+		crouching = {
+			fwd = {
+				high = 7,
+				low = 2
+			},
+			bwd = {
+				high = 3,
+				low = 1
+			},
+			l = {
+				high = 3,
+				low = 1
+			},
+			r = {
+				high = 3,
+				low = 1
+			}
+		},
+		not_crouching = {
+			fwd = {
+				high = 6,
+				low = 2
+			},
+			bwd = {
+				high = 1,
+				low = 1
+			},
+			l = {
+				high = 1,
+				low = 1
+			},
+			r = {
+				high = 1,
+				low = 1
+			}
+		}
+	}
+}
+CopActionHurt.death_anim_fe_variants = {
+	normal = {
+		crouching = {
+			fwd = {
+				high = 5,
+				low = 2
+			},
+			bwd = {
+				high = 2,
+				low = 0
+			},
+			l = {
+				high = 2,
+				low = 0
+			},
+			r = {
+				high = 2,
+				low = 0
+			}
+		},
+		not_crouching = {
+			fwd = {
+				high = 6,
+				low = 2
+			},
+			bwd = {
+				high = 3,
+				low = 0
+			},
+			l = {
+				high = 2,
+				low = 0
+			},
+			r = {
+				high = 2,
+				low = 0
+			}
+		}
+	},
+	heavy = {
+		crouching = {
+			fwd = {
+				high = 0,
+				low = 0
+			},
+			bwd = {
+				high = 0,
+				low = 0
+			},
+			l = {
+				high = 0,
+				low = 0
+			},
+			r = {
+				high = 0,
+				low = 0
+			}
+		},
+		not_crouching = {
+			fwd = {
+				high = 0,
+				low = 0
+			},
+			bwd = {
+				high = 0,
+				low = 0
+			},
+			l = {
+				high = 0,
+				low = 0
+			},
+			r = {
+				high = 0,
+				low = 0
+			}
+		}
+	}
+}
