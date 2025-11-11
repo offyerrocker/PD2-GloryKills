@@ -26,10 +26,10 @@
 				<anim name="heister_execution_front" weight="var1"/>
 				<anim name="heister_execution_rear" weight="var2"/>
 				<keys>
-					<key at="trigger" trigger="execution_slap" callback="anim_execution_slap" class_name="base"/>
-					<key at="trigger" trigger="execution_punchthroat" callback="anim_execution_punchthroat" class_name="base"/>
-					<key at="trigger" trigger="execution_grab" callback="anim_execution_grab" class_name="base"/>
-					<key at="trigger" trigger="execution_kill" callback="anim_execution_kill" class_name="base"/>
+					<key at="trigger" trigger="execution_slap" callback="anim_execution_slap" class_name="movement"/>
+					<key at="trigger" trigger="execution_punchthroat" callback="anim_execution_punchthroat" class_name="movement"/>
+					<key at="trigger" trigger="execution_grab" callback="anim_execution_grab" class_name="movement"/>
+					<key at="trigger" trigger="execution_kill" callback="anim_execution_kill" class_name="movement"/>
 				</keys>
 				<exit name="std/spawn/loop"/>
 				<!--
@@ -101,14 +101,6 @@
 					<key at="trigger" trigger="death" callback="anim_execution_generic" class_name="character_damage" param1="5"/>
 					<key at="death" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
 					
-					<!--
-					<key at="trigger" trigger="force_ragdoll" callback="anim_execution_generic" class_name="character_damage" param1="5"/>
-					<key at="trigger" trigger="enable_ragdoll" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
-				
-					<key at="trigger" trigger="force_ragdoll" callback="anim_clbk_force_ragdoll" class_name="movement"/>
-					<key at="trigger" trigger="enable_ragdoll" set_extension="anim_data" extension_key="ragdoll" extension_value="true"/>
-					-->
-					
 					<key at="enter" callback="anim_execution_generic" class_name="character_damage" param1="7"/>
 					<key at="exit" callback="anim_execution_generic" class_name="character_damage" param1="8"/>
 					
@@ -116,12 +108,6 @@
 					<key at="exit" set_extension="anim_data" extension_key="death" extension_value="false"/>
 					<key at="exit" callback="anim_clbk_force_ragdoll" class_name="movement"/>
 					<key at="exit" set_extension="anim_data" extension_key="ragdoll" extension_value="false"/>
-					<!--
-					<key at="trigger" trigger="force_ragdoll" callback="anim_clbk_force_ragdoll" class_name="movement"/>
-					<key at="trigger" trigger="enable_ragdoll" set_extension="anim_data" extension_key="ragdoll" extension_value="true"/>
-					<key at="exit" callback="anim_clbk_force_ragdoll" class_name="movement"/>
-					<key at="exit" set_extension="anim_data" extension_key="ragdoll" extension_value="false"/>
-					-->
 				</keys>
 				<exit name="death_exit"/>
 			</state>
