@@ -13,7 +13,7 @@ CopDamage._hurt_severities = {
 
 
 function CopDamage:anim_execution_generic(unit,a)
-	Print("CD Animation callback:",unit,a,type(a))
+	GloryKills:Print("CD Animation callback:",unit,a,type(a))
 	
 	if a == 5 then
 		unit:anim_data().ragdoll = true

@@ -4,10 +4,10 @@ end)
 
 
 function PlayerMovement:anim_execution_generic(unit,a)
-	Print("player anim_execution_generic",a)
+	GloryKills:Print("player anim_execution_generic",a)
 end
 function PlayerMovement:anim_execution_exit(unit,a)
-	Print("player anim_execution_exit",a)
+	GloryKills:Print("player anim_execution_exit",a)
 	
 	if alive(GloryKills.unit) then
 		GloryKills.unit:set_position(Vector3(0, 0, -10000))
@@ -16,18 +16,18 @@ end
 
 
 function PlayerMovement:anim_execution_slap(unit,a)
-	Print("player anim_execution_slap",a)
+	GloryKills:Print("player anim_execution_slap",a)
 
 end
 function PlayerMovement:anim_execution_punchthroat(unit,a)
-	Print("player anim_execution_punchthroat",a)
+	GloryKills:Print("player anim_execution_punchthroat",a)
 
 end
 function PlayerMovement:anim_execution_grab(unit,a)
-	Print("player anim_execution_grab",a)
+	GloryKills:Print("player anim_execution_grab",a)
 
 end
 function PlayerMovement:anim_execution_kill(unit,a)
-	Print("player anim_execution_kill",a)
+	GloryKills:Print("player anim_execution_kill",a)
 
 end

@@ -233,7 +233,7 @@ function CopActionHurt:init(action_desc, common_data)
 			redir_res = self._ext_movement:play_redirect("death_execution")
 
 			if not redir_res then
-				log("[CopActionHurt:init] death_execution redirect failed in", self._machine:segment_state(Idstring("base")))
+				GloryKills:Print("[CopActionHurt:init] death_execution redirect failed in", self._machine:segment_state(Idstring("base")))
 
 				return
 			end
@@ -396,7 +396,7 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 
 		if redirect then
-			Print("Playing redirect:",redirect)
+			GloryKills:Print("Playing redirect:",redirect)
 			redir_res = self._ext_movement:play_redirect(redirect)
 		else
 			Application:stack_dump_error("There's no redirect in CopActionHurt!")

@@ -53,7 +53,7 @@ local impact_body_distance_tmp = {
 _G.testhook = function(self, t, input,...)
 
 	local action_wanted = input.btn_melee_press or input.btn_melee_release
-	--Print("press",input.btn_melee_press,"release",input.btn_melee_release)
+	--GloryKills:Print("press",input.btn_melee_press,"release",input.btn_melee_release)
 	if not action_wanted then
 		return
 	end
@@ -283,7 +283,7 @@ _G.testhook = function(self, t, input,...)
 				end
 				
 				if result.type == "death" then
-					--Print("Successful proc. Entering execution state")
+					--GloryKills:Print("Successful proc. Entering execution state")
 					if GloryKills.unit then
 						GloryKills.unit:set_position(my_pos)
 						GloryKills.unit:set_rotation(look_mov)

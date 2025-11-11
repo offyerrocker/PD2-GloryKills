@@ -96,11 +96,11 @@ function GloryKills:spawn_third_unit(unit)
 	end
 
 --	unit_movement.play_redirect = function(self,redirect_name,at_time)
---		if not foobar then Print("play_redirect",redirect_name,debug.traceback()) end
+--		if not foobar then GloryKills:Print("play_redirect",redirect_name,debug.traceback()) end
 --	end
 
 	unit_movement.play_state = function(self,state_name,at_time)
---		if not foobar then Print("play_state",state_name,debug.traceback()) end
+--		if not foobar then GloryKills:Print("play_state",state_name,debug.traceback()) end
 	end
 
 	unit_movement.sync_action_walk_nav_point = function (_self, pos, speed, action)
@@ -261,4 +261,8 @@ function GloryKills.set_viewmodel_visible(state,visible)
 			unit_entry.unit:set_visible(visible)
 		end
 	end
+end
+
+function GloryKills:Print(...)
+	if _G.Print then _G.Print(...) end
 end

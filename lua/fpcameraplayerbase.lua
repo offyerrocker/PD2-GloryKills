@@ -1,3 +1,5 @@
+-- these aren't currently used
+
 function FPCameraPlayerBase:anim_execution_slap(...)
 
 end
@@ -8,7 +10,7 @@ function FPCameraPlayerBase:anim_execution_grab(...)
 
 end
 function FPCameraPlayerBase:anim_execution_generic(s)
-	Print("Animation callback:",s)
+	GloryKills:Print("Animation callback:",s)
 end
 function FPCameraPlayerBase:anim_execution_kill(...)
 	local player = managers.player:local_player()
@@ -20,12 +22,12 @@ function FPCameraPlayerBase:anim_execution_kill(...)
 end
 
 function FPCameraPlayerBase:anim_start_execution(...)
-	Print("FPCameraPlayerBase:anim_start_execution()")
+	GloryKills:Print("FPCameraPlayerBase:anim_start_execution()")
 --	managers.player:local_player():movement():change_state("standard")
 end
 
 function FPCameraPlayerBase:anim_stop_execution(...)
-	Print("FPCameraPlayerBase:anim_stop_execution()")
+	GloryKills:Print("FPCameraPlayerBase:anim_stop_execution()")
 	managers.player:local_player():movement():change_state("standard")
 end
 
