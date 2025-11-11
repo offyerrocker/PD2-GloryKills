@@ -31,6 +31,8 @@ function CopDamage:anim_execution_generic(unit,a)
 	end
 end
 
+do return end
+
 local mvec_1 = Vector3()
 local mvec_2 = Vector3()
 
@@ -43,7 +45,6 @@ Hooks:PostHook(CopDamage,"damage_melee","glorykills_copdamage_melee",function(se
 	end
 end)
 
-do return end
 
 function CopDamage:damage_melee(attack_data)
 	if self._dead or self._invulnerable then

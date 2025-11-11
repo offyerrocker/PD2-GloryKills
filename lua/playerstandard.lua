@@ -227,6 +227,29 @@ _G.testhook = function(self, t, input,...)
 					name_id = melee_entry,
 					charge_lerp_value = 0
 				}
+				
+				-- detect hits from behind
+				mvector3.set(mvec_1, hit_mov_ext:m_pos()) -- prev pos (before moving the enemy)
+				mvector3.subtract(mvec_1, my_pos)
+				mvector3.normalize(mvec_1)
+				mvector3.set(mvec_2, hit_mov_ext:m_rot():y())
+
+				local from_behind = mvector3.dot(mvec_1, mvec_2) >= 0
+				local execution_variant
+				-- set animation variant
+				if from_behind then
+					--log("From behind")
+					execution_variant = "var2"
+				else
+					--log("From front")
+					execution_variant = "var1"
+				end
+				-- i either do a minor sin and set the flag this way (as a member to the movement extension)
+				-- or i do an worse sin and overwrite the whole of CopMovement:damage_clbk() just to pass the variant data properly, which i hate
+				hit_mov_ext._execution_variant = execution_variant
+				-- this does set the flag before we technically know that the execution has succeeded
+				-- but as long as that var is recalculated before each attempt it should be fine
+				
 				local result = dmg_ext:damage_melee(attack_data)
 				
 				if not result then
@@ -254,29 +277,16 @@ _G.testhook = function(self, t, input,...)
 				
 				if result.type == "death" then
 					--Print("Successful proc. Entering execution state")
-					-- detect back hits
-					mvector3.set(mvec_1, hit_mov_ext:m_pos()) -- prev pos (before moving the enemy)
-					mvector3.subtract(mvec_1, my_pos)
-					mvector3.normalize(mvec_1)
-					mvector3.set(mvec_2, hit_mov_ext:m_rot():y())
-
-					local from_behind = mvector3.dot(mvec_1, mvec_2) >= 0
-					local variant
-					if from_behind then
-						-- set variant
-						variant = "var2"
-					else
-						variant = "var1"
-					end
 					if GloryKills.unit then
 						GloryKills.unit:set_position(my_pos)
 						GloryKills.unit:set_rotation(look_mov)
 						
 						local redir = GloryKills.unit:movement():play_redirect("execution")
-						GloryKills.unit:movement()._machine:set_parameter(redir, variant, 1)
+						GloryKills.unit:movement()._machine:set_parameter(redir, execution_variant, 1)
 					end
+					
 					result.variant = "execution"
-					result.execution_variant = variant
+					--result.execution_variant = variant
 
 
 					-- rotate cop to face player
