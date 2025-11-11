@@ -146,23 +146,23 @@ function GloryKills:spawn_third_unit(unit)
 		end
 	end
 
-	unit_movement.set_head_visibility = function (self, visible)
-		self._obj_visibilities = self._obj_visibilities or {}
-		local char_name = managers.criminals:character_name_by_unit(self._unit)
+	unit_movement.set_head_visibility = function (_self, visible)
+		_self._obj_visibilities = _self._obj_visibilities or {}
+		local char_name = managers.criminals:character_name_by_unit(_self._unit)
 		local new_char_name = managers.criminals.convert_old_to_new_character_workname(char_name)
 		-- Disable head and hair objects - many thanks for being inconsistent with naming your objects, Overkill
 		local try_names = { "g_vest_neck", "g_head", "g_head_%s", "g_%s_mask_off", "g_%s_mask_on", "g_hair", "g_%s_hair", "g_hair_mask_on", "g_hair_mask_off" }
 		local obj, key
 		for _, v in ipairs(try_names) do
-			obj = char_name and self._unit:get_object(Idstring(v:format(char_name))) or new_char_name and self._unit:get_object(Idstring(v:format(new_char_name)))
+			obj = char_name and _self._unit:get_object(Idstring(v:format(char_name))) or new_char_name and _self._unit:get_object(Idstring(v:format(new_char_name)))
 			if obj then
 				key = obj:name():key()
-				self._obj_visibilities[key] = self._obj_visibilities[key] or obj:visibility()
-				obj:set_visibility(visible and self._obj_visibilities[key])
+				_self._obj_visibilities[key] = _self._obj_visibilities[key] or obj:visibility()
+				obj:set_visibility(visible and _self._obj_visibilities[key])
 			end
 		end
-		self._mask_visibility = self._mask_visibility or self._unit:inventory()._mask_visibility
-		self._unit:inventory():set_mask_visibility(visible and self._mask_visibility)
+		_self._mask_visibility = _self._mask_visibility or _self._unit:inventory()._mask_visibility
+		_self._unit:inventory():set_mask_visibility(visible and _self._mask_visibility)
 	end
 
 	unit_inventory.set_mask_visibility = function (self, state)
@@ -218,7 +218,7 @@ function GloryKills:spawn_third_unit(unit)
 	if SETTING_IMMERSIVE_FIRST_PERSON then
 		unit_movement:set_head_visibility(false)
 	end
-
+	
 	local level_data = managers.job and managers.job:current_level_data()
 	if level_data and level_data.player_sequence then
 		self.unit:damage():run_sequence_simple(level_data.player_sequence)
