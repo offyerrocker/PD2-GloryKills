@@ -1,3 +1,7 @@
+if _G.IS_VR then
+	return
+end
+
 local mvec_1 = Vector3()
 Hooks:PostHook(PlayerCamera, "set_position", "glorykills_set_position", function (self, pos)
 	local player = managers.player:local_player()

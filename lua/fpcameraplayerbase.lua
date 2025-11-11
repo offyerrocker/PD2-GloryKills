@@ -1,3 +1,7 @@
+if _G.IS_VR then
+	return
+end
+
 local mrot1 = Rotation()
 local mrot2 = Rotation()
 local mrot3 = Rotation()

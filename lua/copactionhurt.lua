@@ -1,3 +1,7 @@
+if _G.IS_VR then
+	return
+end
+
 local mvec3_set = mvector3.set
 local mvec3_set_z = mvector3.set_z
 local mvec3_set_l = mvector3.set_length

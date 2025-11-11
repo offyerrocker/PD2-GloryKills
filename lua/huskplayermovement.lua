@@ -1,3 +1,4 @@
+
 -- these aren't being triggered from the anim, idk why
 function HuskPlayerMovement:anim_execution_slap(...)
 

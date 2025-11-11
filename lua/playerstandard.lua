@@ -1,3 +1,7 @@
+if _G.IS_VR then
+	return
+end
+
 local DEBUG_DRAW_ENABLED = false
 -- visualize raycast line-of-sight checks
 
@@ -290,7 +294,6 @@ _G.testhook = function(self, t, input,...)
 					
 					
 				-- disable the melee that would otherwise occur on this frame
---						self._state_data.melee_attack_allowed_t = 0
 					self._state_data.melee_attack_wanted = nil
 					input.btn_melee_press = nil
 					input.btn_melee_release = nil

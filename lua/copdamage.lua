@@ -1,3 +1,8 @@
+if _G.IS_VR then
+	return
+end
+
+
 --[[
 CopDamage._hurt_severities = {
 	heavy = "heavy_hurt",
@@ -11,7 +16,7 @@ CopDamage._hurt_severities = {
 --]]
 
 
-
+-- key trigger callbacks from anim
 function CopDamage:anim_execution_generic(unit,a)
 	GloryKills:Print("CD Animation callback:",unit,a,type(a))
 	
