@@ -228,10 +228,7 @@ function PlayerStateExecution:enter(state_data,enter_data,...)
 	-- start anim
 	
 	PlayerStateExecution.super.enter(self,state_data,enter_data,...)
-	
-	
-	
-	--self._ext_camera:play_redirect(Idstring("cash_inspect"))
+	GloryKills.set_viewmodel_visible(self,false)
 end
 
 function PlayerStateExecution:_enter(enter_data,...)
@@ -242,10 +239,9 @@ function PlayerStateExecution:exit(state_data,...)
 	self._state_data.melee_attack_wanted = nil
 	self._state_data.melee_attack_allowed_t = nil
 	
-	self._state_data.execution_unit = nil
-	
-	
 	PlayerStateExecution.super.exit(self,state_data,...)	
+	
+	GloryKills.set_viewmodel_visible(self,true)
 end
 
 function PlayerStateExecution:update(t,dt)

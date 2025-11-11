@@ -1,3 +1,6 @@
+local DEBUG_DRAW_ENABLED = true
+-- visualize raycast line-of-sight checks
+
 PlayerStandard.ANIM_STATES.standard.execution = Idstring("execution")
 
 local mvec_1 = Vector3()
@@ -45,76 +48,316 @@ local impact_body_distance_tmp = {
 	Hips = 15
 }
 
+--local mvec_1 = Vector3()
+--local mvec_2 = Vector3()
+_G.testhook = function(self, t, input,...)
+
+	local action_wanted = input.btn_melee_press or input.btn_melee_release
+	--Print("press",input.btn_melee_press,"release",input.btn_melee_release)
+	if not action_wanted then
+		return
+	end
+	
+	local action_forbidden = not self:_melee_repeat_allowed() or self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self:_is_throwing_projectile() or self:_is_using_bipod() or self:is_shooting_count()
+	-- extra conditions specific to the execution
+	or self:in_air() or self:ducking() or self:on_ladder() or self:_on_zipline()
+	
+	if action_forbidden then
+		return
+	end
+	
+	local col_ray = self:_calc_melee_hit_ray(t, 20)
+	local hit_unit = col_ray and col_ray.unit
+	if alive(hit_unit) then
+		
+		-- account for raycast hitting a shield
+		if hit_unit:in_slot(8) then
+			local hit_parent = hit_unit:parent()
+			if alive(hit_parent) then
+				hit_unit = hit_parent
+			end
+		end
+		
+		if managers.enemy:is_enemy(hit_unit) and not managers.enemy:is_civilian(hit_unit) then
+			if hit_unit:in_slot(25,26) then -- sentry guns not allowed >:(
+				--log("Sentry guns cannot be executed")
+				return
+			end
+			
+			if hit_unit:in_slot(2,3,16,25) then -- no jokers either
+				--log("Jokers not allowed")
+				return
+			end
+			
+			
+			local my_mov_ext = self._ext_movement
+			local my_pos = my_mov_ext:m_pos()
+			local my_rot = self._ext_camera:rotation()
+			local look_mov = Rotation(my_rot:yaw(),0,0)
+			local hit_mov_ext = hit_unit:movement()
+			
+			
+			-- perform line-of-sight checks
+			local slotmask = managers.slot:get_mask("world_geometry")
+			local has_los = true
+			local ray
+			do -- check head position
+				mvector3.set(mvec_1,my_mov_ext:m_head_pos())
+				mvector3.set(mvec_2,hit_mov_ext:m_head_pos())
+				ray = World:raycast("ray", mvec_1, mvec_2, "slot_mask", slotmask)
+				if ray then 
+					-- hit obstacle
+					has_los = false
+					
+				end
+				
+				if DEBUG_DRAW_ENABLED then
+					if ray then
+						Draw:brush(Color.red,5):line(mvec_1,mvec_2,5)
+					else
+						Draw:brush(Color.green,5):line(mvec_1,mvec_2,5)
+					end
+				end
+				
+			end
+			
+			ray = nil
+			do -- check body position
+--				mvector3.set(mvec_1,my_mov_ext:m_head_pos()) -- should still be player head pos
+				mvector3.set(mvec_2,hit_unit:oobb():center())
+				ray = World:raycast("ray", mvec_1, mvec_2, "slot_mask", slotmask)
+				if ray then 
+					has_los = false
+				end
+				
+				if DEBUG_DRAW_ENABLED then
+					if ray then
+						Draw:brush(Color.red,5):line(mvec_1,mvec_2,5)
+					else
+						Draw:brush(Color.green,5):line(mvec_1,mvec_2,5)
+					end
+				end
+				
+			end
+			
+			--[[
+			ray = nil
+			do -- check leg/feet position
+				mvector3.set(mvec_1,my_pos)
+				mvector3.add(mvec_1,Vector3(0,0,50))
+				mvector3.set(mvec_2,hit_mov_ext:m_pos())
+				mvector3.add(mvec_2,Vector3(0,0,50))
+				ray = World:raycast("ray", mvec_1, mvec_2, "slot_mask", slotmask)
+				if ray then 
+					has_los = false
+				end
+				
+				if DEBUG_DRAW_ENABLED then
+					if ray then
+						Draw:brush(Color.red,5):line(mvec_1,mvec_2,5)
+					else
+						Draw:brush(Color.green,5):line(mvec_1,mvec_2,5)
+					end
+				end
+			end
+			--]]
+			
+			if not has_los then
+				log("Insufficient line of sight to execution target")
+				return
+			end
+			
+		
+			local dmg_ext = hit_unit:character_damage()
+			if dmg_ext and dmg_ext.damage_melee and dmg_ext.health and not (dmg_ext:dead() or dmg_ext._immortal or dmg_ext._invulnerable) then
+				
+				-- do health check; only attempt proc if melee is estimated to be fatal blow
+				local melee_entry = managers.blackmarket:equipped_melee_weapon()
+				local melee_td = tweak_data.blackmarket.melee_weapons[melee_entry]
+				local damage,_ = managers.blackmarket:equipped_melee_weapon_damage_info(1)
+				damage = damage * managers.player:get_melee_dmg_multiplier()
+	
+				local dmg_multiplier = 1
+				
+				if not managers.groupai:state():is_enemy_special(hit_unit) then
+					dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "non_special_melee_multiplier", 1)
+				else
+					dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_damage_multiplier", 1)
+				end
+				
+				dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_" .. tostring(melee_td.stats.weapon_type) .. "_damage_multiplier", 1)
+
+				if hit_unit:base() and hit_unit:base().char_tweak and hit_unit:base():char_tweak().priority_shout then
+					dmg_multiplier = dmg_multiplier * (melee_td.stats.special_damage_multiplier or 1)
+				end
+
+				if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
+					self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+					self._state_data.stacking_dmg_mul.melee = self._state_data.stacking_dmg_mul.melee or {
+						nil,
+						0
+					}
+					local stack = self._state_data.stacking_dmg_mul.melee
+
+					if stack[1] and t < stack[1] then
+						dmg_multiplier = dmg_multiplier * (1 + managers.player:upgrade_value("melee", "stacking_hit_damage_multiplier", 0) * stack[2])
+					end
+				end
+				
+				local damage_health_ratio = managers.player:get_damage_health_ratio(self._ext_damage:health_ratio(), "melee")
+
+				if damage_health_ratio > 0 then
+					dmg_multiplier = dmg_multiplier * (1 + self._damage_health_ratio_mul_melee * damage_health_ratio)
+				end
+
+				dmg_multiplier = dmg_multiplier * managers.player:temporary_upgrade_value("temporary", "berserker_damage_multiplier", 1)
+				
+				damage = damage * dmg_multiplier
+				if damage < dmg_ext:health() then
+					log("Not projected fatal blow:",damage,dmg_ext:health())
+					return
+				end
+				
+				local attack_data = {
+					variant = "execution",
+					damage = dmg_ext._HEALTH_INIT or 1000000,
+					damage_effect = 0,
+					attacker_unit = self._unit,
+					col_ray = col_ray,
+					name_id = melee_entry,
+					charge_lerp_value = 0
+				}
+				local result = dmg_ext:damage_melee(attack_data)
+				
+				if not result then
+					log("Hit ineffective")
+					return
+				end
+				
+				-- reset bloodthirst stacks
+				if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
+					self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
+					self._state_data.stacking_dmg_mul.melee = self._state_data.stacking_dmg_mul.melee or {
+						nil,
+						0
+					}
+					local stack = self._state_data.stacking_dmg_mul.melee
+
+					if dmg_ext.dead and not dmg_ext:dead() then
+						stack[1] = t + managers.player:upgrade_value("melee", "stacking_hit_expire_t", 1)
+						stack[2] = math.min(stack[2] + 1, tweak_data.upgrades.max_melee_weapon_dmg_mul_stacks or 5)
+					else
+						stack[1] = nil
+						stack[2] = 0
+					end
+				end
+				
+				if result.type == "death" then
+					--Print("Successful proc. Entering execution state")
+					-- detect back hits
+					mvector3.set(mvec_1, hit_mov_ext:m_pos()) -- prev pos (before moving the enemy)
+					mvector3.subtract(mvec_1, my_pos)
+					mvector3.normalize(mvec_1)
+					mvector3.set(mvec_2, hit_mov_ext:m_rot():y())
+
+					local from_behind = mvector3.dot(mvec_1, mvec_2) >= 0
+					local variant
+					if from_behind then
+						-- set variant
+						variant = "var2"
+					else
+						variant = "var1"
+					end
+					if GloryKills.unit then
+						GloryKills.unit:set_position(my_pos)
+						GloryKills.unit:set_rotation(look_mov)
+						
+						local redir = GloryKills.unit:movement():play_redirect("execution")
+						GloryKills.unit:movement()._machine:set_parameter(redir, variant, 1)
+					end
+					result.variant = "execution"
+					result.execution_variant = variant
+
+
+					-- rotate cop to face player
+					-- set position to cop position
+					-- rotate player to face cop
+					-- after anim, move player back to orig pos
+					hit_mov_ext:set_rotation(look_mov)
+					hit_mov_ext:set_position(mvector3.copy(my_pos))
+					self._state_data.execution_unit = hit_unit
+					
+					my_mov_ext:change_state("execution")
+					
+					
+				-- disable the melee that would otherwise occur on this frame
+--						self._state_data.melee_attack_allowed_t = 0
+					self._state_data.melee_attack_wanted = nil
+					input.btn_melee_press = nil
+					input.btn_melee_release = nil
+					return
+				else
+					log("GloryKills: uhh... this is embarrassing. the execution failed to kill the enemy.")
+				end
+			end
+		end
+	end
+end
+
+
 --[[
-
-	playerstate._ext_camera:play_redirect(Idstring("execution"))
-
-
-_G.copdamage_execute_die = function(self,attack_data)
-	if self._immortal then
-		debug_pause("Immortal character died!")
+BeardLib:AddUpdater("asdfljaksdljkf",function(t,dt)
+	if alive(barfoo1) then
+		Draw:brush(Color.red:with_alpha(0.5)):sphere(barfoo1:position(),10)
 	end
-
-	managers.modifiers:run_func("OnEnemyDied", self._unit, attack_data)
-	self:_check_friend_4(attack_data)
-	self:_check_ranc_9(attack_data)
-	CopDamage.MAD_3_ACHIEVEMENT(attack_data)
-	self:_remove_debug_gui()
-	self._unit:base():set_slot(self._unit, 17)
-	self:drop_pickup()
-	self._unit:inventory():drop_shield()
-	self:_chk_unique_death_requirements(attack_data, true)
-
-	if self._unit:unit_data().mission_element then
-		self._unit:unit_data().mission_element:event("death", self._unit)
-
-		if not self._unit:unit_data().alerted_event_called then
-			self._unit:unit_data().alerted_event_called = true
-
-			self._unit:unit_data().mission_element:event("alerted", self._unit)
-		end
+	if alive(barfoo2) then
+		Draw:brush(Color.blue:with_alpha(0.5)):sphere(barfoo2:position(),10)
 	end
+end)
+--]]
 
-	if self._unit:movement() then
-		self._unit:movement():remove_giveaway()
+Hooks:PreHook(PlayerStandard,"_check_action_melee","glorykills_playerstandard_checkmelee",function(...)
+	_G.testhook(...)
+end)
+
+do return end
+
+Hooks:OverrideFunction(PlayerStandard,"_check_action_melee",
+	function(...)
+		_G.testhook(...)
 	end
+)
 
-	self._health = 0
-	self._health_ratio = 0
-	self._dead = true
 
-	self:set_mover_collision_state(false)
 
-	if self._death_sequence then
-		if self._unit:damage() and self._unit:damage():has_sequence(self._death_sequence) then
-			self._unit:damage():run_sequence_simple(self._death_sequence)
-		else
-			debug_pause_unit(self._unit, "[CopDamage:die] does not have death sequence", self._death_sequence, self._unit)
-		end
-	end
+--[[
+local orig = Hooks:GetFunction(PlayerStandard,"_do_action_melee")
+Hooks:OverrideFunction(PlayerStandard,"_do_action_melee",function(self,t,input,skip_damage)
+	
+	
+	
+	return orig(self,t,input,skip_damage)
 
---	if self._unit:base():char_tweak().die_sound_event then
---		self._unit:sound():play(self._unit:base():char_tweak().die_sound_event, nil, nil)
---	end
-
-	self:_on_death()
-	managers.mutators:notify(Message.OnCopDamageDeath, self._unit, attack_data)
-
-	if self._tmp_invulnerable_clbk_key then
-		managers.enemy:remove_delayed_clbk(self._tmp_invulnerable_clbk_key)
-
-		self._tmp_invulnerable_clbk_key = nil
-	end
-end
-
-_G.copdamage_delayed_death_fx = function(self)
-	if self._unit:base():char_tweak().die_sound_event then
-		self._unit:sound():play(self._unit:base():char_tweak().die_sound_event, nil, nil)
-	end
-end
+end)
 --]]
 
 
+--Hooks:PostHook(PlayerStandard,"_do_action_melee","glorykills_onmeleeattack",function(self, t, input, skip_damage)
+--	local unit = self:_calc_melee_hit_ray(t,100)
+-- if valid hit unit is low health, enter execution state
+--end)
+
+--[[
+Hooks:PostHook(PlayerStandard,"_do_melee_damage","glorykills_onmeleedamage",function(self, t, bayonet_melee, melee_hit_ray, melee_entry, hand_id)
+	local defense_data = Hooks:GetReturn()
+	if defense_data and defense_data.result.type == "death" then
+	
+	end
+	
+end)
+--]]
+
+do return end
 
 -- this is no longer necessary
 _G.execute_unit = function(unit,col_ray)
@@ -161,190 +404,6 @@ _G.execute_unit = function(unit,col_ray)
 end
 
 
---local barfool,barfoo2
-
---local mvec_1 = Vector3()
---local mvec_2 = Vector3()
-_G.testhook = function(self, t, input)
-
-	local action_wanted = input.btn_melee_press or input.btn_melee_release
-	--Print("press",input.btn_melee_press,"release",input.btn_melee_release)
-	if not action_wanted then
-		return
-	end
-	
-	local action_forbidden = not self:_melee_repeat_allowed() or self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self:_is_throwing_projectile() or self:_is_using_bipod() or self:is_shooting_count()
-	-- extra conditions specific to the execution
-	or self:in_air() or self:ducking() or self:on_ladder() or self:_on_zipline()
-	
-	
-	
-	if action_forbidden then
-		return
-	end
-	
-	--local melee_entry = managers.blackmarket:equipped_melee_weapon()
-	
-	local col_ray = self:_calc_melee_hit_ray(t, 20)
-	local hit_unit = col_ray and col_ray.unit
-	if hit_unit then
-		if managers.enemy:is_enemy(hit_unit) then
-			local dmg_ext = hit_unit:character_damage()
-			if dmg_ext and dmg_ext.damage_melee and not (dmg_ext:dead() or dmg_ext._immortal) then
-			-- kill the enemy here;
-			-- perform identical damage calculation,
-			-- but without the vfx/sfx,
-			-- only the network
-				
-				
-				
-				
-				local attack_data = {
-					variant = "execution",
-					damage = dmg_ext._HEALTH_INIT or 10000000,
-					damage_effect = 0,
-					attacker_unit = self._unit,
-					col_ray = col_ray,
-					name_id = managers.blackmarket:equipped_melee_weapon(),
-					charge_lerp_value = 0
-				}
-				
-				--local result = _G.copdamage_execute_melee(dmg_ext,attack_data)
-				--redirect
-				--dmg_ext:_on_damage_received(attack_data)
-								
-				local result = dmg_ext:damage_melee(attack_data)
-				--[[
-				dmg_ext:die(attack_data)
-				
-				foo3 = col_ray
-				local damage_info = { -- for triggering the anim
-					damage = attack_data.damage,
-					variant = "melee",
-					pos = col_ray.hit_position or col_ray.position,
-					attack_dir = col_ray.ray,
-					result = {
-						variant = "melee",
-						type = "execution"
-					}
-				}
-				dmg_ext:_call_listeners(damage_info)
-				--]]
-					
-				
---				if dmg_ext:dead() then
-				if result and result.type == "death" then
-					Print("Successful proc. Entering execution state")
-					
-					
-					local my_mov_ext = self._ext_movement
-					local my_pos = my_mov_ext:m_pos()
-					local my_rot = self._ext_camera:rotation() --my_mov_ext:m_rot()
-					local look_mov = Rotation(my_rot:yaw(),0,0)
---					self._state_data.execution_start_position = mvector3.copy(my_pos)
-					-- rotate cop to face player
-					-- set position to cop position
-					-- rotate player to face cop
-					-- after anim, move player back to orig pos
-					
-					local hit_mov_ext = hit_unit:movement()
-					
-					-- detect back hits
-					--[[
-					mvector3.set(mvec_1, hit_mov_ext:m_pos()) -- prev pos (before moving the enemy)
-					mvector3.subtract(mvec_1, my_pos)
-					mvector3.normalize(mvec_1)
-					mvector3.set(mvec_2, hit_mov_ext:m_rot():y())
-
-					local from_behind = mvector3.dot(mvec_1, mvec_2) >= 0
-					--]]
-					if false and from_behind then
-						
-					else
-						
-						if GloryKills.unit then
-							GloryKills.unit:set_position(my_pos)
-							GloryKills.unit:set_rotation(look_mov)
-							GloryKills.unit:movement():play_redirect("execution")
---							barfoo1 = GloryKills.unit
-						end
---						barfoo2 = hit_unit
-						
-						
-						
-						--hit_unit:brain():clbk_death(hit_unit,damage_info)
-						
-						hit_mov_ext:set_rotation(look_mov)
-						hit_mov_ext:set_position(mvector3.copy(my_pos))
-						--hit_mov_ext:play_redirect("death_execution")
-						
-						self._state_data.execution_unit = hit_unit
-						
-						--my_mov_ext:change_state("execution")
-						
-						-- disable the melee that would otherwise occur on this frame
---						self._state_data.melee_attack_wanted = true
---						self._state_data.melee_attack_allowed_t = 0
-					end
-				end
-				
-			end
-		end
-	end
-end
-
---[[
-BeardLib:AddUpdater("asdfljaksdljkf",function(t,dt)
-	if alive(barfoo1) then
-		Draw:brush(Color.red:with_alpha(0.5)):sphere(barfoo1:position(),10)
-	end
-	if alive(barfoo2) then
-		Draw:brush(Color.blue:with_alpha(0.5)):sphere(barfoo2:position(),10)
-	end
-end)
---]]
-
-Hooks:OverrideFunction(PlayerStandard,"_check_action_melee",
-	function(...)
-		_G.testhook(...)
-	end
-)
-
-do return end
-
-Hooks:PreHook(PlayerStandard,"_check_action_melee","glorykills_playerstandard_checkmelee",function(...)
-	_G.testhook(...)
-end)
-
-
---[[
-local orig = Hooks:GetFunction(PlayerStandard,"_do_action_melee")
-Hooks:OverrideFunction(PlayerStandard,"_do_action_melee",function(self,t,input,skip_damage)
-	
-	
-	
-	return orig(self,t,input,skip_damage)
-
-end)
---]]
-
-
---Hooks:PostHook(PlayerStandard,"_do_action_melee","glorykills_onmeleeattack",function(self, t, input, skip_damage)
---	local unit = self:_calc_melee_hit_ray(t,100)
--- if valid hit unit is low health, enter execution state
---end)
-
---[[
-Hooks:PostHook(PlayerStandard,"_do_melee_damage","glorykills_onmeleedamage",function(self, t, bayonet_melee, melee_hit_ray, melee_entry, hand_id)
-	local defense_data = Hooks:GetReturn()
-	if defense_data and defense_data.result.type == "death" then
-	
-	end
-	
-end)
---]]
-
-do return end
 
 _G.copdamage_execute_melee = function(self,attack_data)
 	if self._dead or self._invulnerable then

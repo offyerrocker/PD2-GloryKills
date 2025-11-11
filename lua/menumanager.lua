@@ -100,7 +100,7 @@ function GloryKills:spawn_third_unit(unit)
 --	end
 
 	unit_movement.play_state = function(self,state_name,at_time)
-		if not foobar then Print("play_state",state_name,debug.traceback()) end
+--		if not foobar then Print("play_state",state_name,debug.traceback()) end
 	end
 
 	unit_movement.sync_action_walk_nav_point = function (_self, pos, speed, action)
@@ -246,4 +246,19 @@ function GloryKills:spawn_third_unit(unit)
 	-- Unregister from groupai manager so it doesnt count as an actual criminal
 	managers.groupai:state():unregister_criminal(self.unit)
 
+end
+
+function GloryKills.set_viewmodel_visible(state,visible)
+	local fp = state._camera_unit
+	fp:set_visible(visible)
+	if not visible then
+		fp:base():hide_weapon()
+	else
+		fp:base():show_weapon()
+	end
+	for unit_id, unit_entry in pairs(fp:spawn_manager():spawned_units()) do
+		if alive(unit_entry.unit) then
+			unit_entry.unit:set_visible(visible)
+		end
+	end
 end
