@@ -1,13 +1,14 @@
 
---[[
-TODO:
+--[[ TODO
 
+FIXES:
 - fix 3p unit refusing to be hidden immediately after spawning with player
 - eyeAim bone doesn't reflect what's in blender?
-- incorrect 3p unit for the chosen player character
+
+
+FEATURES:
+- compatibility with Third Person mod
 - blend position/rotation between 3p/1p camera position, when transitioning between states
-
-
 forward-design to expect for enemy type specific animations:
 - bulldozer
 - cloaker
@@ -26,6 +27,7 @@ playbonk's anim notes:
 check if custom state syncing will crash unmodded clients
 
 --]]
+
 
 --managers.player:local_player():movement():current_state()._fwd_ray.unit:set_slot(0)
 
