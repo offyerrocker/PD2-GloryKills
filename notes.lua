@@ -37,7 +37,11 @@ BeardLib:AddUpdater("asdfljaksdljkf",function(t,dt)
 			
 			local rot = obj:rotation()
 			local fwd = rot:z()
-			Draw:brush(Color.blue:with_alpha(0.5)):cylinder(obj:position(),obj:position()+(fwd * 100),3)
+			local side = rot:x()
+			Draw:brush(Color.blue:with_alpha(0.5)):cylinder(obj:position(),obj:position()+(fwd * 100),2)
+			Draw:brush(Color.green:with_alpha(0.5)):cylinder(obj:position(),obj:position()+(side * 100),2)
+			
+			Console:SetTracker(string.format("roll %0.2f",rot:roll()),2)
 		end
 	end
 end)
@@ -155,6 +159,12 @@ end
 
 
 	
-	
-	
+return tweak_data.blackmarket:get_glove_value(GloryKills._character_visual_state.glove_id, character_name, "unit", GloryKills._character_visual_state.player_style, GloryKills._character_visual_state.suit_variation)
+
+
+
+GloryKills:upd_visual_state("wolf",GloryKills._character_visual_state)
+
+
+
 	
