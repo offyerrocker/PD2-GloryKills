@@ -13,10 +13,24 @@ local mvec4 = Vector3()
 local mvec1 = Vector3()
 
 local orig_update_rot = Hooks:GetFunction(FPCameraPlayerBase,"_update_rot")
-function FPCameraPlayerBase:_update_rot(axis, unscaled_axis)
+function FPCameraPlayerBase:_update_rot(axis, unscaled_axis, ...)
+	local player = managers.player:local_player()
+	if alive(player) then
+		local mov_ext = player:movement()
+		local state_name = mov_ext and mov_ext:current_state_name()
+		if state_name ~= "execution" then
+			return orig_update_rot(self,axis,unscaled_axis,...)
+		end
+	else
+		return orig_update_rot(self,axis,unscaled_axis,...)
+	end
+	mvector3.set(axis,Vector3())
+	mvector3.set(unscaled_axis,Vector3())
+	
 	if self._animate_pitch then
 		self:animate_pitch_upd()
 	end
+	
 
 	local t = managers.player:player_timer():time()
 	local dt = t - (self._last_rot_t or t)
@@ -30,7 +44,7 @@ function FPCameraPlayerBase:_update_rot(axis, unscaled_axis)
 	self._parent_unit:m_position(new_head_pos)
 	mvector3.add(new_head_pos, self._head_stance.translation)
 
-	self._input.look = axis 
+	self._input.look = axis
 	self._input.look_multiplier = self._parent_unit:base():controller():get_setup():get_connection("look"):get_multiplier()
 	local stick_input_x, stick_input_y = self._look_function(axis, self._input.look_multiplier, dt, unscaled_axis)
 	local look_polar_spin = data.spin - stick_input_x
@@ -142,23 +156,16 @@ function FPCameraPlayerBase:_update_rot(axis, unscaled_axis)
 		self._parent_unit:camera():set_rotation(self._output_data.rotation)
 	end
 	
-	local player = managers.player:local_player()
-	if alive(player) then
-		local mov_ext = player:movement()
-		local state_name = mov_ext and mov_ext:current_state_name()
-		if state_name == "execution" then
-			if alive(GloryKills.unit) then
-				local obj = GloryKills.unit:get_object(Idstring("eyeAim"))
-				local obrot = obj:rotation()
-				mvector3.set(mvec1,obrot:z())
-				local p = mvec1:to_polar()
-				
-				self._camera_properties.pitch = p.pitch
-				self._camera_properties.spin = p.spin
+	if alive(GloryKills.unit) then
+		local obj = GloryKills.unit:get_object(Idstring("eyeAim"))
+		local obrot = obj:rotation()
+		mvector3.set(mvec1,obrot:z())
+		local p = mvec1:to_polar()
+		
+		self._camera_properties.pitch = p.pitch
+		self._camera_properties.spin = p.spin
 --				self._camera_properties.target_tilt = obrot:roll()
 --				self._camera_properties.current_tilt = obrot:roll()
-			end
-		end
 	end
 end
 

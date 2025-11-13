@@ -2,6 +2,9 @@
 --[[ TODO
 
 FIXES:
+- carry state execution bugged
+	- investigate any states that are child classes of PlayerStandard
+	- state name filter
 - fix 3p unit refusing to be hidden immediately after spawning with player
 - eyeAim bone doesn't reflect what's in blender?
 
