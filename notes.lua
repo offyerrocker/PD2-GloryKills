@@ -46,7 +46,7 @@ BeardLib:AddUpdater("glorykills_eyeaim_vis",function(t,dt)
 			Draw:brush(Color.blue:with_alpha(0.5)):cylinder(obj:position(),obj:position()+(fwd * 100),2)
 			Draw:brush(Color.green:with_alpha(0.5)):cylinder(obj:position(),obj:position()+(side * 100),2)
 			
-			Console:SetTracker(string.format("roll %0.2f",rot:roll()),2)
+--			Console:SetTracker(string.format("roll %0.2f",rot:roll()),2)
 		end
 	end
 end)
