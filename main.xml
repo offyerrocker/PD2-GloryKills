@@ -1,4 +1,4 @@
-<mod name="Glory Kills" author="PlayBonk and Offyerrocker" color="Color(0.9,0.9,0.5)">
+<mod name="Glory Kills" author="PlayBONK and Offyerrocker" color="Color(0.9,0.9,0.5)">
 	<!--
 	<AssetUpdates id="-10000" version="1.0.0" provider="modworkshop" install_directory = "mods/" version_is_number="false"/>
 	<Localization directory="l10n" default="english.json">
@@ -9,8 +9,17 @@
 	<AddFiles directory="assets">
 		<animation path="anims/shared/rifle/generic/heister_execution_front" />
 		<animation path="anims/shared/rifle/generic/heister_execution_rear" />
+		<animation path="anims/shared/rifle/generic/heister_execution_knife_front" />
+		<animation path="anims/shared/rifle/generic/heister_execution_knife_rear" />
+		<animation path="anims/shared/rifle/generic/heister_execution_axe_front" />
+		<!--<animation path="anims/shared/rifle/generic/heister_execution_axe_rear" />-->
+		
 		<animation path="anims/shared/rifle/generic/gen_death_execution_front" />
 		<animation path="anims/shared/rifle/generic/gen_death_execution_rear" />
+		<animation path="anims/shared/rifle/generic/gen_death_execution_knife_front" />
+		<animation path="anims/shared/rifle/generic/gen_death_execution_knife_rear" />
+		<animation path="anims/shared/rifle/generic/gen_death_execution_axe_front" />
+		<!--<animation path="anims/shared/rifle/generic/gen_death_execution_axe_rear" />-->
 	</AddFiles>
 	
 </mod>
