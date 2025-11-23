@@ -3,6 +3,16 @@ Hooks:PostHook(HuskPlayerMovement,"init","init_execution_spawn_melee_prop",funct
 	--self._custom_anim_effects = {}
 end)
 
+local axes = {"fireaxe","beardy"}
+local knives = {"rambo","chef","fairbair","kabartanto","kabar","toothbrush","kampfmesser","gerber","becker","bayonet","x46","bowie","switchblade","scoutknife","pugio","shawn","ballistic","wing","grip"}
+local machetes = nil --for machetes and small axes
+local bats = nil --bats and shit like the ruler will be here
+local batons = nil --batons and the morningstar will be here
+local daggers = nil --stabby stab knives and things like syringe and kunai will be here, including fairbair and switchblade
+local spears = nil --mainly for the flag and the pitchfork
+
+local uniques = nil --briefcase, money bundle, roaming frothing madness of a chainsaw, sledgehammer, katana, great sword, sai, probably the axes should be here too later
+
 function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_point, called_prop_nickname)	
 
 	local animation_prop_align_obj = self._unit:get_object(Idstring(attachment_point))
@@ -11,12 +21,27 @@ function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_poi
 	local unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].third_unit
 	
 	log ("anim_execution_spawn_melee_prop: equipped melee is", melee_entry, "unit is", unit_name )
-			
-	if animation_prop_align_obj and melee_entry == "rambo" or melee_entry == "fireaxe" then
-		self:_unspawn_execution_melee_prop(called_prop_nickname)
-		local animation_prop = World:spawn_unit(Idstring(unit_name), animation_prop_align_obj:position(), animation_prop_align_obj:rotation())
-		self._unit:link(animation_prop_align_obj:name(), animation_prop, animation_prop:orientation_object():name())
-		self._execution_anim_props[called_prop_nickname] = animation_prop
+	
+	for k,v in ipairs(axes) do 
+		if v == melee_entry then
+			if animation_prop_align_obj then
+				self:_unspawn_execution_melee_prop(called_prop_nickname)
+				local animation_prop = World:spawn_unit(Idstring(unit_name), animation_prop_align_obj:position(), animation_prop_align_obj:rotation())
+				self._unit:link(animation_prop_align_obj:name(), animation_prop, animation_prop:orientation_object():name())
+				self._execution_anim_props[called_prop_nickname] = animation_prop
+			end
+		end
+	end
+	
+	for k,v in ipairs(knives) do 
+		if v == melee_entry then
+			if animation_prop_align_obj then
+				self:_unspawn_execution_melee_prop(called_prop_nickname)
+				local animation_prop = World:spawn_unit(Idstring(unit_name), animation_prop_align_obj:position(), animation_prop_align_obj:rotation())
+				self._unit:link(animation_prop_align_obj:name(), animation_prop, animation_prop:orientation_object():name())
+				self._execution_anim_props[called_prop_nickname] = animation_prop
+			end
+		end
 	end
 end
 

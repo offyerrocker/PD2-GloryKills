@@ -15,7 +15,15 @@ local melee_vars = {
 	"player_melee_var2"
 }
 
+local axes = {"fireaxe","beardy"}
+local knives = {"rambo","chef","fairbair","kabartanto","kabar","toothbrush","kampfmesser","gerber","becker","bayonet","x46","bowie","switchblade","scoutknife","pugio","shawn","ballistic","wing","grip"}
+local machetes = nil --for machetes and small axes
+local bats = nil --bats and shit like the ruler will be here
+local batons = nil --batons and the morningstar will be here
+local daggers = nil --stabby stab knives and things like syringe and kunai will be here, including fairbair and switchblade
+local spears = nil --mainly for the flag and the pitchfork
 
+local uniques = nil --briefcase, money bundle, roaming frothing madness of a chainsaw, sledgehammer, katana, great sword, sai, probably the axes should be here too later
 
 
 Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayonet_melee, melee_hit_ray, melee_entry, hand_id)
@@ -210,21 +218,29 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 
 				if from_behind then
 					--log("From behind")
-					if equipped_melee_weapon == "rambo" then
-						execution_variant = "rear_knife_var1"
-					elseif equipped_melee_weapon == "fireaxe" then
-						execution_variant = "rear_axe_var1"
-					else 
-						execution_variant = "rear_hand_var1"
+					execution_variant = "rear_hand_var1"
+					for k,v in ipairs(knives) do 
+						if v == melee_entry then
+							execution_variant = "rear_knife_var1"
+						end
+					end
+					for k,v in ipairs(axes) do 
+						if v == melee_entry then
+							execution_variant = "rear_axe_var1"
+						end
 					end
 				else
 					--log("From front")
-					if equipped_melee_weapon == "rambo" then
-						execution_variant = "front_knife_var1"
-					elseif equipped_melee_weapon == "fireaxe" then
-						execution_variant = "front_axe_var1"
-					else 
-						execution_variant = "front_hand_var1"
+					execution_variant = "front_hand_var1"
+					for k,v in ipairs(knives) do 
+						if v == melee_entry then
+							execution_variant = "front_knife_var1"
+						end
+					end
+					for k,v in ipairs(axes) do 
+						if v == melee_entry then
+							execution_variant = "front_axe_var1"
+						end
 					end
 				end
 				
@@ -546,21 +562,29 @@ _G.testhook = function(self, t, input,...)
 				
 				if from_behind then
 					--log("From behind")
-					if equipped_melee_weapon == "rambo" then
-						execution_variant = "rear_knife_var1"
-					elseif equipped_melee_weapon == "fireaxe" then
-						execution_variant = "rear_axe_var1"
-					else 
-						execution_variant = "rear_hand_var1"
+					execution_variant = "rear_hand_var1"
+					for k,v in ipairs(knives) do 
+						if v == melee_entry then
+							execution_variant = "rear_knife_var1"
+						end
+					end
+					for k,v in ipairs(axes) do 
+						if v == melee_entry then
+							execution_variant = "rear_axe_var1"
+						end
 					end
 				else
 					--log("From front")
-					if equipped_melee_weapon == "rambo" then
-						execution_variant = "front_knife_var1"
-					elseif equipped_melee_weapon == "fireaxe" then
-						execution_variant = "front_axe_var1"
-					else 
-						execution_variant = "front_hand_var1"
+					execution_variant = "front_hand_var1"
+					for k,v in ipairs(knives) do 
+						if v == melee_entry then
+							execution_variant = "front_knife_var1"
+						end
+					end
+					for k,v in ipairs(axes) do 
+						if v == melee_entry then
+							execution_variant = "front_axe_var1"
+						end
 					end
 				end
 
