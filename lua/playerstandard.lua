@@ -192,6 +192,21 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 				is_execution = false
 			end
 			
+			-- if a second hit would be lethal, give the damage as a bonus
+			-- to trigger a kill with the execution;
+			-- this is a workaround for the fact that i don't know an easy way to interrupt the current action/animation with the execution anim
+			if is_execution then 
+				local damage2,_ = managers.blackmarket:equipped_melee_weapon_damage_info(0)
+				damage2 = damage2 * dmg_multiplier
+				if dmg_ext.health and (dmg_ext:health() <= damage + damage2) then
+					--todo: account for capt winters damage reduction?
+					--or just apply max damage? -- damage = dmg_ext._HEALTH_INIT
+					damage = damage + damage2
+				else
+					is_execution = false
+				end
+			end
+			
 			if is_execution then
 				
 				-- detect hits from behind
