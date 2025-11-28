@@ -34,7 +34,7 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 	else
 		col_ray = self:_calc_melee_hit_ray(t, sphere_cast_radius)
 	end
-
+	
 	if col_ray and alive(col_ray.unit) then
 		local damage, damage_effect = managers.blackmarket:equipped_melee_weapon_damage_info(charge_lerp_value)		
 		local damage_effect_mul = math.max(managers.player:upgrade_value("player", "melee_knockdown_mul", 1), managers.player:upgrade_value(self._equipped_unit:base():weapon_tweak_data().categories and self._equipped_unit:base():weapon_tweak_data().categories[1], "melee_knockdown_mul", 1))
@@ -108,7 +108,12 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 		end
 
 		character_unit = character_unit or hit_unit
-
+		
+		--vvvvvvvvvvvvvvvvvvvvvvv
+		local char_base = character_unit:base()
+		-- note: minor unmarked changes to optimize extension calls like character_unit:base() elsewhere in the otherwise-vanilla code
+		--^^^^^^^^^^^^^^^^^^^^^^^
+		
 		if character_unit:character_damage() and character_unit:character_damage().damage_melee then
 			local dmg_multiplier = 1
 
@@ -120,7 +125,7 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 
 			dmg_multiplier = dmg_multiplier * managers.player:upgrade_value("player", "melee_" .. tostring(tweak_data.blackmarket.melee_weapons[melee_entry].stats.weapon_type) .. "_damage_multiplier", 1)
 
-			if character_unit:base() and character_unit:base().char_tweak and character_unit:base():char_tweak().priority_shout then
+			if char_base and char_base.char_tweak and char_base:char_tweak().priority_shout then
 				dmg_multiplier = dmg_multiplier * (tweak_data.blackmarket.melee_weapons[melee_entry].stats.special_damage_multiplier or 1)
 			end
 
@@ -148,7 +153,7 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 
 			dmg_multiplier = dmg_multiplier * managers.player:temporary_upgrade_value("temporary", "berserker_damage_multiplier", 1)
 			local target_dead = character_unit:character_damage().dead and not character_unit:character_damage():dead()
-			local target_hostile = managers.enemy:is_enemy(character_unit) and not tweak_data.character[character_unit:base()._tweak_table].is_escort and character_unit:brain():is_hostile()
+			local target_hostile = managers.enemy:is_enemy(character_unit) and not tweak_data.character[char_base._tweak_table].is_escort and character_unit:brain():is_hostile()
 			local life_leach_available = managers.player:has_category_upgrade("temporary", "melee_life_leech") and not managers.player:has_activate_temporary_upgrade("temporary", "melee_life_leech")
 
 			if target_dead and target_hostile and life_leach_available then
@@ -157,27 +162,41 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 			end
 			
 --vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-			local dmg_ext = hit_unit:character_damage()
+			local dmg_ext = character_unit:character_damage()
 			local my_mov_ext = self._ext_movement
 			local my_pos = my_mov_ext:m_pos()
 			local my_rot = self._ext_camera:rotation()
 			local look_mov = Rotation(my_rot:yaw(),0,0)
-			local hit_mov_ext = hit_unit:movement()
+			local mov_ext = character_unit:movement()
 			
 			local execution_variant
 			local is_execution = not (self:in_air() or self:ducking() or self:on_ladder() or self:_on_zipline())
-			is_execution = is_execution and managers.enemy:is_enemy(hit_unit) and not managers.enemy:is_civilian(hit_unit)
+			is_execution = is_execution and managers.enemy:is_enemy(character_unit) and not managers.enemy:is_civilian(character_unit)
 			
-			if is_execution and hit_unit:in_slot(25,26) then -- sentry guns not allowed >:(
+			if is_execution and character_unit:in_slot(25,26) then -- sentry guns not allowed >:(
 				--log("Sentry guns cannot be executed")
 				is_execution = false
 			end
 			
-			if is_execution and hit_unit:in_slot(2,3,16,25) then -- no jokers either
+			if is_execution and character_unit:in_slot(2,3,16,25) then -- no jokers either
 				--log("Jokers not allowed")
 				is_execution = false
 			end
-			local anim_data = hit_unit:anim_data()
+			
+			if is_execution and char_base and char_base.has_tag then
+				if char_base:has_tag("shield") or char_base:has_tag("phalanx_vip") or char_base:has_tag("phalanx_minion") then
+					-- exclude shields, winters, and phalanx shields
+					return 
+				end
+				
+				-- special variations (for later)
+--				if char_base:has_tag("tank") then
+--				end
+--				if char_base:has_tag("spooc") then
+--				end
+			end
+			
+			local anim_data = character_unit:anim_data()
 			if is_execution and (anim_data.hurt or anim_data.hurt_exit) then
 				-- can't override hurt anims so don't trigger the execution
 				is_execution = false
@@ -209,10 +228,10 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 			if is_execution then
 				
 				-- detect hits from behind
-				mvector3.set(mvec_1, hit_mov_ext:m_pos()) -- prev pos (before moving the enemy)
+				mvector3.set(mvec_1, mov_ext:m_pos()) -- prev pos (before moving the enemy)
 				mvector3.subtract(mvec_1, my_pos)
 				mvector3.normalize(mvec_1)
-				mvector3.set(mvec_2, hit_mov_ext:m_rot():y())
+				mvector3.set(mvec_2, mov_ext:m_rot():y())
 
 				local from_behind = mvector3.dot(mvec_1, mvec_2) >= 0
 				-- set animation variant
@@ -222,7 +241,7 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 					from_behind = from_behind
 				})
 			end
-			hit_mov_ext._execution_variant = execution_variant
+			mov_ext._execution_variant = execution_variant
 --			Print("execution_variant",execution_variant)
 --^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 			local action_data = {
@@ -282,9 +301,9 @@ Hooks:OverrideFunction(PlayerStandard,"_do_melee_damage",function(self, t, bayon
 					GloryKills.unit:movement()._machine:set_parameter(redir, execution_variant, 1)
 				end
 				
-				hit_mov_ext:set_rotation(look_mov)
-				hit_mov_ext:set_position(mvector3.copy(my_pos))
-				self._state_data.execution_unit = hit_unit
+				mov_ext:set_rotation(look_mov)
+				mov_ext:set_position(mvector3.copy(my_pos))
+				self._state_data.execution_unit = character_unit
 				self._state_data.execution_prev_state = my_mov_ext:current_state_name() or "standard"
 				GloryKills.set_viewmodel_visible(self,false)
 				my_mov_ext:change_state("execution")
