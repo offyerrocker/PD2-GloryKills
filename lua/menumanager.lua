@@ -72,8 +72,12 @@ GloryKills._execution_anim_conditions = { -- vars used for both enemy death and 
 		}
 	},
 	hatchet = {
-		front = {},
-		rear = {}
+		front = {
+			"front_hatchet_var1"
+		},
+		rear = {
+			"rear_hatchet_var1"
+		}
 	},
 	knife = {
 		front = {
