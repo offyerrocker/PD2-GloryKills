@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<tweaks>
+	<tweak version="2" name="anims/units/enemies/cop/cop_def" extension="animation_def">
+		<search>
+			<xml/>
+			<animatable_set name="cop"/>
+		</search>
+
+		<target mode="attach">
+			<bone name="eyeAim"/>
+		</target>
+	</tweak>
+
+	<tweak version="2" name="anims/units/enemies/cop/cop_def" extension="animation_def">
+		<search>
+			<xml/>
+			<blend_set name="all" animatable_set="cop"/>
+		</search>
+
+		<target mode="append">
+			<blend_set name="glorykill_player" animatable_set="cop">
+				<blend alias="all" weight="1.0"/>
+				<blend name="eyeAim" weight="1.0"/>
+			</blend_set>
+		</target>
+	</tweak>
+</tweaks>
