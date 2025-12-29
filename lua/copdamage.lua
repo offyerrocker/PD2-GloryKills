@@ -203,6 +203,25 @@ function CopDamage:anim_execution_generic(unit,a)
 	end
 end
 
+function CopDamage:callback_play_effect(unit,effect_path,object_name,position,normal,rotation)
+	local align_obj = object_name and unit:get_object(Idstring(object_name))
+	
+	World:effect_manager():spawn({
+		effect = Idstring(effect_path),
+		position = position or align_obj:position(),
+		normal = normal or align_obj:rotation():y(),
+		rotation = rotation
+	})
+	
+end
+
+function CopDamage:callback_play_sound(unit,event)
+	local snd_ext = unit:sound()
+	if snd_ext then
+		snd_ext:play(event)
+	end
+end
+
 do return end
 
 local mvec_1 = Vector3()
