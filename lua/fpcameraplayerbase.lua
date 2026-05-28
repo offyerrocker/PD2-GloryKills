@@ -159,7 +159,7 @@ function FPCameraPlayerBase:_update_rot(axis, unscaled_axis, ...)
 	if alive(GloryKills.unit) then
 		local obj = GloryKills.unit:get_object(Idstring("eyeAim"))
 		local obrot = obj:rotation()
-		mvector3.set(mvec1,obrot:z())
+		mvector3.set(mvec1,obrot:y())
 		local p = mvec1:to_polar()
 		
 		self._camera_properties.pitch = p.pitch
