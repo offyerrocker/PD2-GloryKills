@@ -32,6 +32,44 @@ check if custom state syncing will crash unmodded clients
 --]]
 
 
+--[[scraps
+GloryKills.sounds = {
+	knife_hit_gen
+	fairbairn_hit_body
+	
+				managers.game_play_central:play_impact_flesh({
+					col_ray = col_ray
+				})
+				managers.game_play_central:play_impact_sound_and_effects({
+					no_decal = true,
+					no_sound = true,
+					col_ray = col_ray
+				})
+			end
+
+			self._camera_unit:base():play_anim_melee_item("hit_body")
+	
+}
+
+
+
+					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound" 			class_name="movement" param1="l1d_mov" />
+
+
+
+
+					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound" 				class_name="movement" param1="f31x_any" />
+					
+					
+					
+					<key at="trigger" trigger="execution_kill" 		callback="callback_play_effect" 			class_name="movement" param1="effect" param2="effects/payday2/particles/explosions/molotov_grenade" param3="position" param4="(1,2,3)" param5="normal" param6="(0,1,0)" />
+					
+					
+					<key at="trigger" trigger="execution_kill" callback="callback_play_effect" class_name="movement" param1="effect" param2="effects/payday2/particles/explosions/molotov_grenade" param3="position" param4="(1,2,3)" param5="normal" param6="(0,1,0)" />
+
+--]]
+
+
 --managers.player:local_player():movement():current_state()._fwd_ray.unit:set_slot(0)
 
 BeardLib:AddUpdater("glorykills_eyeaim_vis",function(t,dt)

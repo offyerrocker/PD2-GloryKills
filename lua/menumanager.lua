@@ -528,3 +528,113 @@ function GloryKills:upd_visual_state(character_name,visual_state) -- based on Cr
 	}
 --]]
 end
+
+
+---------- sounds/effects callbacks
+
+function GloryKills.callback_play_sound(unit,event)
+	if event and alive(unit) then
+		local snd_ext = unit:sound()
+		if snd_ext then
+			snd_ext:play(event)
+		end
+	end
+end
+
+function GloryKills.callback_play_effect(unit,...)
+	local handlers = { -- [key] : [function]
+		position = GloryKills.GetVector3FromParameters,
+		effect = function(args)
+			return tostring(args[1]) -- first argument
+			-- todo check if objects can be parented to other objects;
+			-- if so, needs a loop to check the tree
+		end,
+		normal = GloryKills.GetVector3FromParameters,
+		rotation = GloryKills.GetRotationFromParameters,
+		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end
+	}
+	
+	local arguments = {} -- final arguments to effect spawner call
+	
+	local mode,parameters -- individual variables to hand to each handler for any given mode (eg. the caller specifies "position" and gives three values; use the position handler to create the final position value from those three values)
+	for i,value in ipairs({...}) do
+		if handlers[value] then
+			-- new mode;
+			-- handle previous mode first
+			if mode and handlers[mode] then
+				arguments[mode] = handlers[mode](parameters)
+			end
+			
+			mode = value
+			parameters = {}
+		end
+		-- collect all values for this mode
+		-- then execute the previous callback when a new mode begins
+	end
+	
+	if mode and handlers[mode] then
+		arguments[mode] = handlers[mode](parameters)
+	end
+	
+	assert(arguments.effect,"GloryKills: Invalid effect " .. type(arguments.effect) .. " [" .. tostring(arguments.effect) .. "]")
+	--assert(arguments.position,"GloryKills: Invalid position " .. type(arguments.position) .. " [" .. tostring(arguments.position) .. "]")
+	arguments.position = arguments.position or Vector3()
+	arguments.normal = arguments.normal or Vector3()
+	
+	foo1 = arguments
+	log("cb Play effect")
+	
+	do return end
+	
+	local effect_id = World:effect_manager():spawn(arguments)
+	if effect_id ~= -1 then
+		log("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(parameters.effect) .. "]")
+	else
+		log("GloryKills: failed to spawn effect: [" .. tostring(parameters.effect) .. "]")
+	end
+end
+
+
+
+-- deserialize constructor arguments from one or more strings
+function GloryKills.DeserializeArgs(args)
+	local tbl
+	if #args == 1 then
+		local s = args[1]
+		-- assume it's formatted as a single string like (3.1415,69420,0.1)
+		-- remove leading/trailing parentheses characters ()
+		s = string.gsub(s,"^%(","")
+		s = string.gsub(s,"%)$","")
+		tbl = string.split(s,",")
+	else
+		tbl = {}
+	end
+	
+	for i,v in ipairs(args) do 
+		tbl[i] = tonumber(v)
+	end
+	
+	return tbl
+end
+
+-- helper functions for the effect spawner
+function GloryKills.GetVector3FromParameters(args)
+	local tbl = GloryKills.DeserializeArgs(args)
+	return Vector3(unpack(tbl))
+end
+
+function GloryKills.GetRotationFromParameters(args)
+	local tbl = GloryKills.DeserializeArgs(args)
+	return Rotation(unpack(tbl))
+end
+
+-- from this unit, get the first applicable object in the provided list
+function GloryKills.GetObjectFromParameters(args,unit)
+	for i,v in ipairs(args) do 
+		local object = unit:get_object(Idstring(tostring(v)))
+		if object then
+			return object
+		end
+	end
+	return unit:orientation_object()
+end

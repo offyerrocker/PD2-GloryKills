@@ -3,8 +3,7 @@ Hooks:PostHook(HuskPlayerMovement,"init","init_execution_spawn_melee_prop",funct
 	--self._custom_anim_effects = {}
 end)
 
-function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_point, called_prop_nickname)	
-
+function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_point, called_prop_nickname)
 	local animation_prop_align_obj = self._unit:get_object(Idstring(attachment_point))
 			
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
@@ -24,11 +23,12 @@ function HuskPlayerMovement:_unspawn_execution_melee_prop(called_prop_nickname)
 	--log("_unspawn_execution_melee_prop called")
 	if called_prop_nickname then
 		local animation_prop = self._execution_anim_props[called_prop_nickname]
+		self._execution_anim_props[called_prop_nickname] = nil
 		if animation_prop and alive(animation_prop) then
 			animation_prop:unlink()
 			World:delete_unit(animation_prop)
+			return true
 		end
-		self._execution_anim_props[called_prop_nickname] = nil
 	end
 end
 
@@ -37,43 +37,20 @@ function HuskPlayerMovement:anim_clbk_unspawn_execution_melee_prop(unit, called_
 	self:_unspawn_execution_melee_prop(called_prop_nickname)
 end
 
-function HuskPlayerMovement:play_execution_sound_equipped(unit, sound_id, variation)
-
-	--local melee_entry = managers.blackmarket:equipped_melee_weapon()
+-- sound_type can be 
+function HuskPlayerMovement:play_execution_sound(unit, sound_type, variation)
+-- based on PlayerStandard:_play_melee_sound()
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	
 	--log("Execution equipped sound callback, weapon is ", melee_entry, " sound id is ", sound_id, " variation is ", variation )
 
-	--local melee_tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
+	local melee_tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
 	
-	if not tweak_data.sounds or not tweak_data.sounds[sound_id] then
+	local post_event = melee_tweak_data.sounds and melee_tweak_data.sounds[sound_type]
+	if not post_event then
 		return
 	end
 
-	local post_event = tweak_data.sounds[sound_id]
-
-	if type(post_event) == "table" then
-		post_event = post_event[variation] or post_event[1]
-	end
-
-	self._unit:sound():play(post_event, nil, false)
-end
-
-function HuskPlayerMovement:play_execution_sound(unit, sound_id, variation)
-
-	--local melee_entry = managers.blackmarket:equipped_melee_weapon()
-	
-	--local melee_entry = "weapon"
-	
-	--log("Execution sound callback, weapon is ", melee_entry, " sound id is ", sound_id, " variation is ", variation )
-
-	
-	--local melee_tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
-
-	if not tweak_data.sounds or not tweak_data.sounds[sound_id] then
-		return
-	end
-
-	local post_event = tweak_data.sounds[sound_id]
 
 	if type(post_event) == "table" then
 		post_event = post_event[variation] or post_event[1]
@@ -113,4 +90,17 @@ function HuskPlayerMovement:anim_stop_execution(...)
 			state:on_execution_complete()
 		end
 	end
+end
+
+
+
+-- custom functions from GloryKills, not vanilla
+function HuskPlayerMovement:callback_play_effect(unit,...)
+	GloryKills:Print("HuskPlayerMovement:callback_play_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
+end
+
+function HuskPlayerMovement:callback_play_sound(unit,event,...)
+	GloryKills:Print("HuskPlayerMovement:callback_play_sound() ",unit,event,...)
+	return GloryKills.callback_play_sound(unit,event,...)
 end

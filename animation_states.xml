@@ -40,14 +40,10 @@
 				<anim name="heister_execution_hatchet_rear" weight="rear_hatchet_var1"/>
 				<keys>
 					<key at="enter"    	callback="anim_execution_spawn_melee_prop"     class_name="movement" param1="a_weapon_right_front" param2="melee_weapon_prop"/>
-					<key at="trigger" trigger="execution_slap" 		callback="play_execution_sound_equipped" 	class_name="movement" param1="hit_gen" param2="1" />
 					<key at="trigger" trigger="execution_slap" 		callback="play_execution_sound" 			class_name="movement" param1="hit_gen" param2="1" />
 					<key at="trigger" trigger="execution_punch" 	callback="play_execution_sound" 			class_name="movement" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_punch" 	callback="play_execution_sound_equipped" 	class_name="movement" param1="hit_body" param2="1" />
 					<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound" 			class_name="movement" param1="hit_gen" param2="1" />
-					<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound_equipped" 	class_name="movement" param1="hit_gen" param2="1" />
 					<key at="trigger" trigger="execution_kill" 		callback="play_execution_sound" 			class_name="movement" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_kill" 		callback="play_execution_sound_equipped" 	class_name="movement" param1="hit_body" param2="1" />
 					<key at="exit"    callback="anim_clbk_unspawn_execution_melee_prop"     class_name="movement" param0="melee_weapon_prop"/>
 					<key at="exit" 	  callback="anim_stop_execution" class_name="movement"/>
 				</keys>
