@@ -9,7 +9,7 @@ function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_poi
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local third_unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].third_unit
 	
-	--log ("anim_execution_spawn_melee_prop: equipped melee is", melee_entry, "unit is", third_unit_name )
+	GloryKills:Print ("anim_execution_spawn_melee_prop: equipped melee is", melee_entry, "unit is", third_unit_name )
 	
 	if animation_prop_align_obj and third_unit_name then
 		self:_unspawn_execution_melee_prop(called_prop_nickname)
@@ -37,7 +37,6 @@ function HuskPlayerMovement:anim_clbk_unspawn_execution_melee_prop(unit, called_
 	self:_unspawn_execution_melee_prop(called_prop_nickname)
 end
 
--- sound_type can be 
 function HuskPlayerMovement:play_execution_sound(unit, sound_type, variation)
 -- based on PlayerStandard:_play_melee_sound()
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()

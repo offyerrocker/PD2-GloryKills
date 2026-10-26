@@ -3,6 +3,8 @@ Hooks:PostHook(PlayerMovement,"_setup_states","glorykills_registerstate",functio
 end)
 
 
+
+-- the below should not be used
 function PlayerMovement:anim_execution_generic(unit,a)
 	GloryKills:Print("player anim_execution_generic",a)
 end

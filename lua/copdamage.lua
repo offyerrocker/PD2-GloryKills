@@ -184,7 +184,7 @@ end)
 
 -- key trigger callbacks from anim
 function CopDamage:anim_execution_generic(unit,a)
---	GloryKills:Print("CD Animation callback:",unit,a,type(a))
+	GloryKills:Print("CopDamage Animation callback:",unit,a,type(a))
 	
 	if a == 5 then
 		unit:anim_data().ragdoll = true
@@ -203,17 +203,23 @@ function CopDamage:anim_execution_generic(unit,a)
 	end
 end
 
-function CopDamage:callback_play_effect(unit,effect_path,object_name,position,normal,rotation)
-	local align_obj = object_name and unit:get_object(Idstring(object_name))
-	
-	World:effect_manager():spawn({
-		effect = Idstring(effect_path),
-		position = position or align_obj:position(),
-		normal = normal or align_obj:rotation():y(),
-		rotation = rotation
-	})
-	
+
+-- custom functions from GloryKills, not vanilla
+function CopDamage:callback_play_effect(unit,...)
+	GloryKills:Print("CopDamage:callback_play_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
 end
+
+function CopDamage:play_execution_melee_sound(unit,event,...)
+	GloryKills:Print("CopDamage:play_execution_melee_sound() ",unit,event,...)
+	return GloryKills.callback_play_melee_sound(unit,event,...)
+end
+
+function CopDamage:play_execution_sound(unit,event,...)
+	GloryKills:Print("CopDamage:play_execution_sound() ",unit,event,...)
+	return GloryKills.callback_play_sound(unit,event,...)
+end
+
 
 function CopDamage:callback_play_sound(unit,event)
 	local snd_ext = unit:sound()

@@ -130,7 +130,7 @@ function GloryKills:get_execution_variant(params)
 		end
 	end
 	
-	-- ruh roh rhaggy! fallback to defauls
+	-- ruh roh rhaggy! fallback to defaults
 	if from_behind then
 		return "rear_hand_var1"
 	else
@@ -532,26 +532,73 @@ end
 
 ---------- sounds/effects callbacks
 
+function GloryKills.get_equipped_melee_sound_event(event_type,variation)
+	if not event_type then return end
+	
+-- based on PlayerStandard:_play_melee_sound()
+	local melee_entry = managers.blackmarket:equipped_melee_weapon()
+	
+	--log("Execution equipped sound callback, weapon is ", melee_entry, " sound id is ", sound_id, " variation is ", variation )
+
+	local melee_tweak_data = tweak_data.blackmarket.melee_weapons[melee_entry]
+	
+	local post_event = melee_tweak_data.sounds and melee_tweak_data.sounds[event_type]
+	if not post_event then
+		return
+	end
+
+
+	if type(post_event) == "table" then
+		post_event = variation and post_event[variation] or post_event[1]
+	end
+	
+	return post_event
+	
+--	self._unit:sound():play(post_event, nil, false)
+end
+
+function GloryKills.callback_play_melee_sound(unit,event_type)
+	local event = GloryKills.get_equipped_melee_sound_event(event_type)
+	if event and alive(unit) then
+		local snd_ext = unit:sound()
+		if snd_ext then
+			snd_ext:play(event,nil,false)
+		end
+	end
+end
+
 function GloryKills.callback_play_sound(unit,event)
 	if event and alive(unit) then
 		local snd_ext = unit:sound()
 		if snd_ext then
-			snd_ext:play(event)
+			snd_ext:play(event,nil,false)
 		end
 	end
 end
 
 function GloryKills.callback_play_effect(unit,...)
+	local settings = {
+		inherit_rotation = false -- if true, ignores the user-supplied rotation and uses the parent object rotation as the effect rotation
+		--inherit_normal = false -- not sure if this is different from rotation
+	}
+	
 	local handlers = { -- [key] : [function]
 		position = GloryKills.GetVector3FromParameters,
 		effect = function(args)
 			return tostring(args[1]) -- first argument
-			-- todo check if objects can be parented to other objects;
-			-- if so, needs a loop to check the tree
 		end,
 		normal = GloryKills.GetVector3FromParameters,
 		rotation = GloryKills.GetRotationFromParameters,
-		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end
+		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end,
+		inherit_rotation = function(args)
+			local raw_state = args[1]
+			local state = raw_state == "true"
+			--Print("inherit rotation?",state,type(state))
+			
+			settings.inherit_rotation = state -- and true or false
+			
+			return nil -- we don't want this function to actually give any value to the constructor parameters
+		end
 	}
 	
 	local arguments = {} -- final arguments to effect spawner call
@@ -561,12 +608,14 @@ function GloryKills.callback_play_effect(unit,...)
 		if handlers[value] then
 			-- new mode;
 			-- handle previous mode first
-			if mode and handlers[mode] then
+			if mode and handlers[mode] then -- don't fulfil previous mode if this is the first mode in the list
 				arguments[mode] = handlers[mode](parameters)
 			end
 			
 			mode = value
 			parameters = {}
+		else
+			table.insert(parameters,#parameters+1,value)
 		end
 		-- collect all values for this mode
 		-- then execute the previous callback when a new mode begins
@@ -577,20 +626,24 @@ function GloryKills.callback_play_effect(unit,...)
 	end
 	
 	assert(arguments.effect,"GloryKills: Invalid effect " .. type(arguments.effect) .. " [" .. tostring(arguments.effect) .. "]")
+	arguments.effect = Idstring(arguments.effect)
 	--assert(arguments.position,"GloryKills: Invalid position " .. type(arguments.position) .. " [" .. tostring(arguments.position) .. "]")
 	arguments.position = arguments.position or Vector3()
 	arguments.normal = arguments.normal or Vector3()
 	
-	foo1 = arguments
-	log("cb Play effect")
+	if settings.inherit_rotation and arguments.parent then
+		arguments.rotation = arguments.parent:rotation()
+	end
 	
-	do return end
+--	_G.foo1 = arguments
+--	GloryKills:Print("cb Play effect")
+	
 	
 	local effect_id = World:effect_manager():spawn(arguments)
 	if effect_id ~= -1 then
-		log("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(parameters.effect) .. "]")
+--		GloryKills:Print("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(parameters.effect) .. "]")
 	else
-		log("GloryKills: failed to spawn effect: [" .. tostring(parameters.effect) .. "]")
+--		GloryKills:Print("GloryKills: failed to spawn effect: [" .. tostring(parameters.effect) .. "]")
 	end
 end
 
@@ -630,6 +683,10 @@ end
 
 -- from this unit, get the first applicable object in the provided list
 function GloryKills.GetObjectFromParameters(args,unit)
+
+	-- todo check if objects can be parented to other objects;
+	-- if so, needs a loop to check the tree instead, or a flag to toggle this behavior
+			
 	for i,v in ipairs(args) do 
 		local object = unit:get_object(Idstring(tostring(v)))
 		if object then

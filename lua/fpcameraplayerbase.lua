@@ -271,6 +271,19 @@ end
 
 
 
+
+-- custom functions from GloryKills, not vanilla
+function FPCameraPlayerBase:callback_play_effect(unit,...)
+	GloryKills:Print("FPCameraPlayerBase:callback_play_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
+end
+
+function FPCameraPlayerBase:callback_play_sound(unit,event,...)
+	GloryKills:Print("FPCameraPlayerBase:callback_play_sound() ",unit,event,...)
+	return GloryKills.callback_play_sound(unit,event,...)
+end
+
+
 --[[
 
 -- custom functions from GloryKills, not vanilla
