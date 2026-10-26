@@ -67,6 +67,23 @@ GloryKills.sounds = {
 					
 					<key at="trigger" trigger="execution_kill" callback="callback_play_effect" class_name="movement" param1="effect" param2="effects/payday2/particles/explosions/molotov_grenade" param3="position" param4="(1,2,3)" param5="normal" param6="(0,1,0)" />
 
+
+					<!-- test callbacks; you can use these as templates
+					<key at="trigger" trigger="execution_slap" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_gen" param2="1" />
+					<key at="trigger" trigger="execution_punch" 	callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_gen" param2="1" />
+					<key at="trigger" trigger="execution_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_pull_out" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_stab" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_axe_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_axe_pull_out" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					
+					<key at="death" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
+					<key at="enter" callback="anim_execution_generic" class_name="character_damage" param1="7"/>
+					<key at="exit" callback="anim_execution_generic" class_name="character_damage" param1="8"/>
+					-->
+
 --]]
 
 

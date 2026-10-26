@@ -575,6 +575,7 @@ end
 
 function GloryKills.callback_play_effect(unit,...)
 	local settings = {
+		auto_parent = true -- if true, automatically uses the orientation object as the effect parent as a fallback (ie if parent parameter is not supplied, or if supplied parent is not found)
 --		inherit_rotation = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied rotation, if supplied)
 --		inherit_position = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied position, if supplied)
 --		ignore_parent = false -- if true, spawn position/rotation can still be inherited from parent, but the effect itself is not force parented
@@ -587,7 +588,14 @@ function GloryKills.callback_play_effect(unit,...)
 		end,
 		normal = GloryKills.GetVector3FromParameters,
 		rotation = GloryKills.GetRotationFromParameters,
-		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end
+		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end,
+		auto_parent = function(args)
+			local state = GloryKills.GetBooleanFromParameters(args[1])
+			if state ~= nil then
+				settings.auto_parent = state
+			end
+			return nil -- we don't want this function to actually give any value to the constructor parameters
+		end
 		--[[
 		inherit_rotation = function(args)
 			local state = GloryKills.GetBooleanFromParameters(args[1])
@@ -595,22 +603,21 @@ function GloryKills.callback_play_effect(unit,...)
 				settings.inherit_rotation = state
 			end
 			--Print("inherit rotation?",state,type(state))
-			return nil -- we don't want this function to actually give any value to the constructor parameters
+			return nil
 		end,
 		inherit_position = function(args)
 			local state = GloryKills.GetBooleanFromParameters(args[1])
 			if state ~= nil then
 				settings.inherit_position = state
 			end
-			-- set on true or false; ignore others as invalid
-			return nil -- we don't want this function to actually give any value to the constructor parameters
+			return nil
 		end,
 		ignore_parent = function(args)
 			local state = GloryKills.GetBooleanFromParameters(args[1])
 			if state ~= nil then
 				settings.ignore_parent = state
 			end
-			return nil -- we don't want this function to actually give any value to the constructor parameters
+			return nil
 		end
 		--]]
 	}
@@ -644,6 +651,11 @@ function GloryKills.callback_play_effect(unit,...)
 	
 	arguments.effect = Idstring(effect_name)
 	--assert(arguments.position,"GloryKills: Invalid position " .. type(arguments.position) .. " [" .. tostring(arguments.position) .. "]")
+	
+	-- fallback effect parent
+	if settings.auto_parent and not arguments.parent then
+		arguments.parent = unit:orientation_object()
+	end
 	
 	
 	
