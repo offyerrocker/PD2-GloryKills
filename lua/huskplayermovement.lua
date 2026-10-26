@@ -71,9 +71,10 @@ function HuskPlayerMovement:play_execution_sound_melee(unit,event_type,...)
 	return GloryKills.callback_play_sound_melee(unit,event_type,...)
 end
 
+-- use actual player unit for sounds, because the sound may cut off after execution (when the 3p unit teleports under the map)
 function HuskPlayerMovement:play_execution_sound_gen(unit,event,...)
 	GloryKills:Print("HuskPlayerMovement:play_execution_sound_gen() ",unit,event,...)
-	return GloryKills.callback_play_sound_gen(unit,event,...)
+	return GloryKills.callback_play_sound_gen(managers.player:local_player(),event,...)
 end
 
 
