@@ -9,7 +9,7 @@ function HuskPlayerMovement:anim_execution_spawn_melee_prop(unit, attachment_poi
 	local melee_entry = managers.blackmarket:equipped_melee_weapon()
 	local third_unit_name = tweak_data.blackmarket.melee_weapons[melee_entry].third_unit
 	
-	GloryKills:Print ("anim_execution_spawn_melee_prop: equipped melee is", melee_entry, "unit is", third_unit_name )
+	--GloryKills:Print ("anim_execution_spawn_melee_prop: equipped melee is", melee_entry, "unit is", third_unit_name )
 	
 	if animation_prop_align_obj and third_unit_name then
 		self:_unspawn_execution_melee_prop(called_prop_nickname)

@@ -575,10 +575,9 @@ end
 
 function GloryKills.callback_play_effect(unit,...)
 	local settings = {
-		inherit_rotation = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied rotation, if supplied)
-		inherit_position = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied position, if supplied)
-		ignore_parent = false -- if true, spawn position/rotation can still be inherited from parent, but the effect itself is not force parented
-		--inherit_normal = false -- not sure if this is different from rotation
+--		inherit_rotation = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied rotation, if supplied)
+--		inherit_position = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied position, if supplied)
+--		ignore_parent = false -- if true, spawn position/rotation can still be inherited from parent, but the effect itself is not force parented
 	}
 	
 	local handlers = { -- [key] : [function]
@@ -588,7 +587,8 @@ function GloryKills.callback_play_effect(unit,...)
 		end,
 		normal = GloryKills.GetVector3FromParameters,
 		rotation = GloryKills.GetRotationFromParameters,
-		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end,
+		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end
+		--[[
 		inherit_rotation = function(args)
 			local state = GloryKills.GetBooleanFromParameters(args[1])
 			if state ~= nil then
@@ -612,6 +612,7 @@ function GloryKills.callback_play_effect(unit,...)
 			end
 			return nil -- we don't want this function to actually give any value to the constructor parameters
 		end
+		--]]
 	}
 	
 	local arguments = {} -- final arguments to effect spawner call
@@ -643,13 +644,16 @@ function GloryKills.callback_play_effect(unit,...)
 	
 	arguments.effect = Idstring(effect_name)
 	--assert(arguments.position,"GloryKills: Invalid position " .. type(arguments.position) .. " [" .. tostring(arguments.position) .. "]")
-	arguments.position = arguments.position or Vector3()
-	arguments.normal = arguments.normal or Vector3() 
 	
+	
+	
+	-- rotation and position are already local, added to parent's if provided
+	--[[
 	local parent = arguments.parent
 	if not settings.ignore_parent then
 		parent = parent or unit:orientation_object()
 	end
+	
 	
 	if parent then
 		local rot_1 = parent:rotation()
@@ -662,28 +666,23 @@ function GloryKills.callback_play_effect(unit,...)
 		end
 		
 		if arguments.position then
-			-- i think position is offset from parent automatically, if parent is supplied, not certain
-			-- might be a local position parameter
 			if settings.inherit_position and not arguments.parent then
 				mvector3.add(arguments.position,pos_1)
 			end
 			
 			-- rotate after translation offset;
 			-- todo specify which object to rotate with - camera, specified rotation from xml, or parent object)
-			mvector3.rotate_with(arguments.position,rot_1)
+			--mvector3.rotate_with(arguments.position,rot_1)
 		end
 	end
+	--]]
 	
-	
-	if string.find(effect_name,"balloon") then
-		_G.foo1 = arguments
-	end
+--	_G.foo1 = arguments
 --	GloryKills:Print("cb Play effect")
-	
 	
 	local effect_id = World:effect_manager():spawn(arguments)
 	if effect_id ~= -1 then
-		GloryKills:Print("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(effect_name) .. "]")
+		GloryKills:Print("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(effect_name) .. "] at",arguments.position,arguments.rotation)
 	else
 		GloryKills:Print("GloryKills: failed to spawn effect (is it loaded?): [" .. tostring(effect_name) .. "]")
 	end
