@@ -401,7 +401,7 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 
 		if redirect then
-			GloryKills:Print("Playing redirect:",redirect)
+			--GloryKills:Print("Playing redirect:",redirect)
 			redir_res = self._ext_movement:play_redirect(redirect)
 		else
 			Application:stack_dump_error("There's no redirect in CopActionHurt!")
