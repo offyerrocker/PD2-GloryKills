@@ -53,12 +53,12 @@ GloryKills.sounds = {
 
 
 
-					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound" 			class_name="movement" param1="l1d_mov" />
+					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound_gen" 			class_name="movement" param1="l1d_mov" />
 
 
 
 
-					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound" 				class_name="movement" param1="f31x_any" />
+					<key at="trigger" trigger="execution_kill" 		callback="callback_play_sound_gen" 				class_name="movement" param1="f31x_any" />
 					
 					
 					

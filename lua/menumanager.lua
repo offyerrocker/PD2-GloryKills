@@ -117,6 +117,8 @@ GloryKills._execution_anim_conditions = { -- vars used for both enemy death and 
 	}
 }
 
+GloryKills.HIDDEN_POSITION = Vector3(0,0,-10000)
+
 function GloryKills:get_execution_variant(params)
 	local variant = params.variant
 	local from_behind = params.from_behind
@@ -198,7 +200,7 @@ function GloryKills:spawn_third_unit(unit,character_name,visual_seed)
 	end
 
 	self.fp_unit = player
-	self.unit = alive(self.unit) and self.unit or World:spawn_unit(unit_name_ids, pos, rot)
+	self.unit = alive(self.unit) and self.unit or World:spawn_unit(unit_name_ids, GloryKills.HIDDEN_POSITION, rot)
 	self.head_obj = self.unit:get_object(Idstring("Head"))
 	Network:detach_unit(self.unit)
 
@@ -557,17 +559,12 @@ function GloryKills.get_equipped_melee_sound_event(event_type,variation)
 --	self._unit:sound():play(post_event, nil, false)
 end
 
-function GloryKills.callback_play_melee_sound(unit,event_type)
+function GloryKills.callback_play_sound_melee(unit,event_type)
 	local event = GloryKills.get_equipped_melee_sound_event(event_type)
-	if event and alive(unit) then
-		local snd_ext = unit:sound()
-		if snd_ext then
-			snd_ext:play(event,nil,false)
-		end
-	end
+	GloryKills.callback_play_sound_gen(unit,event)
 end
 
-function GloryKills.callback_play_sound(unit,event)
+function GloryKills.callback_play_sound_gen(unit,event)
 	if event and alive(unit) then
 		local snd_ext = unit:sound()
 		if snd_ext then
@@ -578,7 +575,9 @@ end
 
 function GloryKills.callback_play_effect(unit,...)
 	local settings = {
-		inherit_rotation = false -- if true, ignores the user-supplied rotation and uses the parent object rotation as the effect rotation
+		inherit_rotation = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied rotation, if supplied)
+		inherit_position = true, -- if true, uses the parent object rotation as the effect rotation (adds the user-supplied position, if supplied)
+		ignore_parent = false -- if true, spawn position/rotation can still be inherited from parent, but the effect itself is not force parented
 		--inherit_normal = false -- not sure if this is different from rotation
 	}
 	
@@ -591,12 +590,26 @@ function GloryKills.callback_play_effect(unit,...)
 		rotation = GloryKills.GetRotationFromParameters,
 		parent = function(args) return GloryKills.GetObjectFromParameters(args,unit) end,
 		inherit_rotation = function(args)
-			local raw_state = args[1]
-			local state = raw_state == "true"
+			local state = GloryKills.GetBooleanFromParameters(args[1])
+			if state ~= nil then
+				settings.inherit_rotation = state
+			end
 			--Print("inherit rotation?",state,type(state))
-			
-			settings.inherit_rotation = state -- and true or false
-			
+			return nil -- we don't want this function to actually give any value to the constructor parameters
+		end,
+		inherit_position = function(args)
+			local state = GloryKills.GetBooleanFromParameters(args[1])
+			if state ~= nil then
+				settings.inherit_position = state
+			end
+			-- set on true or false; ignore others as invalid
+			return nil -- we don't want this function to actually give any value to the constructor parameters
+		end,
+		ignore_parent = function(args)
+			local state = GloryKills.GetBooleanFromParameters(args[1])
+			if state ~= nil then
+				settings.ignore_parent = state
+			end
 			return nil -- we don't want this function to actually give any value to the constructor parameters
 		end
 	}
@@ -625,25 +638,54 @@ function GloryKills.callback_play_effect(unit,...)
 		arguments[mode] = handlers[mode](parameters)
 	end
 	
-	assert(arguments.effect,"GloryKills: Invalid effect " .. type(arguments.effect) .. " [" .. tostring(arguments.effect) .. "]")
-	arguments.effect = Idstring(arguments.effect)
+	local effect_name = arguments.effect
+	assert(effect_name,"GloryKills: Invalid effect " .. type(effect_name) .. " [" .. tostring(effect_name) .. "]")
+	
+	arguments.effect = Idstring(effect_name)
 	--assert(arguments.position,"GloryKills: Invalid position " .. type(arguments.position) .. " [" .. tostring(arguments.position) .. "]")
 	arguments.position = arguments.position or Vector3()
-	arguments.normal = arguments.normal or Vector3()
+	arguments.normal = arguments.normal or Vector3() 
 	
-	if settings.inherit_rotation and arguments.parent then
-		arguments.rotation = arguments.parent:rotation()
+	local parent = arguments.parent
+	if not settings.ignore_parent then
+		parent = parent or unit:orientation_object()
 	end
 	
---	_G.foo1 = arguments
+	if parent then
+		local rot_1 = parent:rotation()
+		local pos_1 = parent:position()
+		
+		
+		if settings.inherit_rotation and arguments.rotation then
+			local rot_2 = arguments.rotation 
+			arguments.rotation = Rotation(rot_1:yaw() + rot_2:yaw(),rot_1:pitch() + rot_2:pitch(),rot_1:roll() + rot_2:roll())
+		end
+		
+		if arguments.position then
+			-- i think position is offset from parent automatically, if parent is supplied, not certain
+			-- might be a local position parameter
+			if settings.inherit_position and not arguments.parent then
+				mvector3.add(arguments.position,pos_1)
+			end
+			
+			-- rotate after translation offset;
+			-- todo specify which object to rotate with - camera, specified rotation from xml, or parent object)
+			mvector3.rotate_with(arguments.position,rot_1)
+		end
+	end
+	
+	
+	if string.find(effect_name,"balloon") then
+		_G.foo1 = arguments
+	end
 --	GloryKills:Print("cb Play effect")
 	
 	
 	local effect_id = World:effect_manager():spawn(arguments)
 	if effect_id ~= -1 then
---		GloryKills:Print("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(parameters.effect) .. "]")
+		GloryKills:Print("GloryKills: spawned effect #" .. tostring(effect_id) .. ": [" .. tostring(effect_name) .. "]")
 	else
---		GloryKills:Print("GloryKills: failed to spawn effect: [" .. tostring(parameters.effect) .. "]")
+		GloryKills:Print("GloryKills: failed to spawn effect (is it loaded?): [" .. tostring(effect_name) .. "]")
 	end
 end
 
@@ -681,6 +723,17 @@ function GloryKills.GetRotationFromParameters(args)
 	return Rotation(unpack(tbl))
 end
 
+function GloryKills.GetBooleanFromParameters(args)
+	-- set on true or false; ignore others as invalid
+	local state
+	if raw_state == "true" then
+		state = true
+	elseif raw_state == "false" then
+		state = false
+	end
+	return state
+end
+
 -- from this unit, get the first applicable object in the provided list
 function GloryKills.GetObjectFromParameters(args,unit)
 
@@ -693,5 +746,5 @@ function GloryKills.GetObjectFromParameters(args,unit)
 			return object
 		end
 	end
-	return unit:orientation_object()
+	--return unit:orientation_object()
 end

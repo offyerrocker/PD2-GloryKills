@@ -58,6 +58,26 @@ function HuskPlayerMovement:play_execution_sound(unit, sound_type, variation)
 	self._unit:sound():play(post_event, nil, false)
 end
 
+
+-- custom functions from GloryKills, not vanilla
+function HuskPlayerMovement:play_execution_effect(unit,...)
+	GloryKills:Print("HuskPlayerMovement:play_execution_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
+end
+
+
+function HuskPlayerMovement:play_execution_sound_melee(unit,event_type,...)
+	GloryKills:Print("HuskPlayerMovement:play_execution_sound_melee() ",unit,event_type,...)
+	return GloryKills.callback_play_sound_melee(unit,event_type,...)
+end
+
+function HuskPlayerMovement:play_execution_sound_gen(unit,event,...)
+	GloryKills:Print("HuskPlayerMovement:play_execution_sound_gen() ",unit,event,...)
+	return GloryKills.callback_play_sound_gen(unit,event,...)
+end
+
+
+
 -- these aren't being triggered from the anim, idk why
 function HuskPlayerMovement:anim_execution_slap(...)
 
@@ -91,15 +111,3 @@ function HuskPlayerMovement:anim_stop_execution(...)
 	end
 end
 
-
-
--- custom functions from GloryKills, not vanilla
-function HuskPlayerMovement:callback_play_effect(unit,...)
-	GloryKills:Print("HuskPlayerMovement:callback_play_effect() ",unit,...)
-	return GloryKills.callback_play_effect(unit,...)
-end
-
-function HuskPlayerMovement:callback_play_sound(unit,event,...)
-	GloryKills:Print("HuskPlayerMovement:callback_play_sound() ",unit,event,...)
-	return GloryKills.callback_play_sound(unit,event,...)
-end

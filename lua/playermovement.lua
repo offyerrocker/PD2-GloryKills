@@ -12,7 +12,7 @@ function PlayerMovement:anim_execution_exit(unit,a)
 	GloryKills:Print("player anim_execution_exit",a)
 	
 	if alive(GloryKills.unit) then
-		GloryKills.unit:set_position(Vector3(0, 0, -10000))
+		GloryKills.unit:set_position(GloryKills.HIDDEN_POSITION)
 	end
 end
 

@@ -1,4 +1,4 @@
-	
+--[[ not used; use CopDamage callbacks intead
 -- custom functions from GloryKills, not vanilla
 function CopMovement:callback_play_effect(unit,...)
 	GloryKills:Print("CopMovement:callback_play_effect() ",unit,...)
@@ -9,3 +9,4 @@ function CopMovement:callback_play_sound(unit,event,...)
 	GloryKills:Print("CopMovement:callback_play_sound() ",unit,event,...)
 	return GloryKills.callback_play_sound(unit,event,...)
 end
+--]]

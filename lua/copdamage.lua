@@ -182,6 +182,26 @@ Hooks:OverrideFunction(CopDamage,"damage_melee",function(self, attack_data)
 	return result
 end)
 
+
+-- custom functions from GloryKills, not vanilla
+function CopDamage:play_execution_effect(unit,...)
+	GloryKills:Print("CopDamage:play_execution_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
+end
+
+function CopDamage:play_execution_sound_melee(unit,event_type,...)
+	GloryKills:Print("CopDamage:play_execution_sound_melee() ",unit,event_type,...)
+	return GloryKills.callback_play_sound_melee(unit,event_type,...)
+end
+
+function CopDamage:play_execution_sound_gen(unit,event,...)
+	GloryKills:Print("CopDamage:play_execution_sound_gen() ",unit,event,...)
+	return GloryKills.callback_play_sound_gen(unit,event,...)
+end
+
+do return end
+
+
 -- key trigger callbacks from anim
 function CopDamage:anim_execution_generic(unit,a)
 	GloryKills:Print("CopDamage Animation callback:",unit,a,type(a))
@@ -204,31 +224,9 @@ function CopDamage:anim_execution_generic(unit,a)
 end
 
 
--- custom functions from GloryKills, not vanilla
-function CopDamage:callback_play_effect(unit,...)
-	GloryKills:Print("CopDamage:callback_play_effect() ",unit,...)
-	return GloryKills.callback_play_effect(unit,...)
-end
-
-function CopDamage:play_execution_melee_sound(unit,event,...)
-	GloryKills:Print("CopDamage:play_execution_melee_sound() ",unit,event,...)
-	return GloryKills.callback_play_melee_sound(unit,event,...)
-end
-
-function CopDamage:play_execution_sound(unit,event,...)
-	GloryKills:Print("CopDamage:play_execution_sound() ",unit,event,...)
-	return GloryKills.callback_play_sound(unit,event,...)
-end
 
 
-function CopDamage:callback_play_sound(unit,event)
-	local snd_ext = unit:sound()
-	if snd_ext then
-		snd_ext:play(event)
-	end
-end
 
-do return end
 
 local mvec_1 = Vector3()
 local mvec_2 = Vector3()

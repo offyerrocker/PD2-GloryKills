@@ -169,11 +169,6 @@ function FPCameraPlayerBase:_update_rot(axis, unscaled_axis, ...)
 	end
 end
 
-
-
---]]
-
-
 --[[
 function FPCameraPlayerBase:update(unit, t, dt)
 	if self._tweak_data.aim_assist_use_sticky_aim then
@@ -235,8 +230,18 @@ end
 
 
 
+-- not used (won't trigger from 3p anim unit)
+--[[
+-- custom functions from GloryKills, not vanilla
+function FPCameraPlayerBase:callback_play_effect(unit,...)
+	GloryKills:Print("FPCameraPlayerBase:callback_play_effect() ",unit,...)
+	return GloryKills.callback_play_effect(unit,...)
+end
 
--- these aren't currently used
+function FPCameraPlayerBase:callback_play_sound(unit,event,...)
+	GloryKills:Print("FPCameraPlayerBase:callback_play_sound() ",unit,event,...)
+	return GloryKills.callback_play_sound_gen(unit,event,...)
+end
 
 function FPCameraPlayerBase:anim_execution_slap(...)
 
@@ -268,33 +273,4 @@ function FPCameraPlayerBase:anim_stop_execution(...)
 	GloryKills:Print("FPCameraPlayerBase:anim_stop_execution()")
 	managers.player:local_player():movement():change_state("standard")
 end
-
-
-
-
--- custom functions from GloryKills, not vanilla
-function FPCameraPlayerBase:callback_play_effect(unit,...)
-	GloryKills:Print("FPCameraPlayerBase:callback_play_effect() ",unit,...)
-	return GloryKills.callback_play_effect(unit,...)
-end
-
-function FPCameraPlayerBase:callback_play_sound(unit,event,...)
-	GloryKills:Print("FPCameraPlayerBase:callback_play_sound() ",unit,event,...)
-	return GloryKills.callback_play_sound(unit,event,...)
-end
-
-
---[[
-
--- custom functions from GloryKills, not vanilla
-function FPCameraPlayerBase:callback_play_effect(unit,...)
-	log("PLAY EFFECT")
-	--return GloryKills.callback_play_effect(unit,...)
-end
-
-function FPCameraPlayerBase:callback_play_sound(unit,event,...)
-	log("PLAY SOUND")
-	--return GloryKills.callback_play_sound(unit,event,...)
-end
-
 --]]

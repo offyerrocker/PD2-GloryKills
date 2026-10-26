@@ -39,6 +39,10 @@
 				<anim name="heister_execution_hatchet_front" weight="front_hatchet_var1"/>
 				<anim name="heister_execution_hatchet_rear" weight="rear_hatchet_var1"/>
 				<keys>
+				
+					<key at="trigger" trigger="execution_grab" callback="play_execution_effect" class_name="movement" param1="effect" param2="effects/payday2/particles/explosions/balloon_pop_green" param3="position" param4="(0,0,300)" param5="rotation" param6="(0,90,0)" />
+					<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound_gen" 			class_name="movement" param1="f31x_any" />
+				
 					<key at="enter"    	callback="anim_execution_spawn_melee_prop"     class_name="movement" param1="a_weapon_right_front" param2="melee_weapon_prop"/>
 					<key at="exit"    callback="anim_clbk_unspawn_execution_melee_prop"     class_name="movement" param0="melee_weapon_prop"/>
 					<key at="exit" 	  callback="anim_stop_execution" class_name="movement"/>
@@ -116,30 +120,22 @@
 				<anim name="gen_death_execution_hatchet_rear" weight="rear_hatchet_var1"/>
 				<keys timebase="relative">
 					
-				<key at="trigger" trigger="execution_grab" callback="callback_play_effect" class_name="character_damage" param1="effect" param2="effects/payday2/particles/explosions/molotov_grenade" param3="position" param4="(1,2,3)" param5="rotation" param6="(0,90,0)" param7="inherit_rotation" param8="true" />
-				<key at="trigger" trigger="execution_grab" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_gen" param2="1" />
+				<key at="trigger" trigger="execution_grab" callback="play_execution_effect" class_name="character_damage" param1="effect" param2="effects/payday2/particles/explosions/molotov_grenade" param3="position" param4="(1,2,3)" param5="rotation" param6="(0,90,0)" param7="inherit_rotation" param8="true" />
+				<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_gen" param2="1" />
 					<!-- test callbacks; you can use these as templates
-					<key at="trigger" trigger="execution_slap" callback="anim_execution_generic" class_name="character_damage" param1="1"/>
-					<key at="trigger" trigger="execution_punch" callback="anim_execution_generic" class_name="character_damage" param1="2"/>
-					<key at="trigger" trigger="execution_grab" callback="anim_execution_generic" class_name="character_damage" param1="3"/>
-					<key at="trigger" trigger="execution_kill" callback="anim_execution_generic" class_name="character_damage" param1="4"/>
-					
-					<key at="trigger" trigger="execution_slap" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_gen" param2="1" />
-					<key at="trigger" trigger="execution_punch" 	callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_grab" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_gen" param2="1" />
-					<key at="trigger" trigger="execution_kill" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_knife_kill" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_knife_pull_out" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_knife_stab" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_axe_kill" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					<key at="trigger" trigger="execution_axe_pull_out" 		callback="play_execution_melee_sound" 			class_name="character_damage" param1="hit_body" param2="1" />
-					
+					<key at="trigger" trigger="execution_slap" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_gen" param2="1" />
+					<key at="trigger" trigger="execution_punch" 	callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_grab" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_gen" param2="1" />
+					<key at="trigger" trigger="execution_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_pull_out" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_knife_stab" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_axe_kill" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
+					<key at="trigger" trigger="execution_axe_pull_out" 		callback="play_execution_sound_melee" 			class_name="character_damage" param1="hit_body" param2="1" />
 					
 					<key at="death" callback="anim_execution_generic" class_name="character_damage" param1="6"/>
-					
 					<key at="enter" callback="anim_execution_generic" class_name="character_damage" param1="7"/>
 					<key at="exit" callback="anim_execution_generic" class_name="character_damage" param1="8"/>
-					
 					-->
 					
 					<key at="trigger" trigger="death" callback="anim_clbk_force_ragdoll" class_name="movement" />
